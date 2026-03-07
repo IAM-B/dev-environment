@@ -21,7 +21,7 @@
 
 <!-- Replace the placeholder below with your actual GIF -->
 <p align="center">
-  <img src="assets/demo.gif" alt="Demo: launching the dev environment with zc" width="800">
+  <img src="assets/demo.webp" alt="Demo: launching the dev environment with zc" width="800">
 </p>
 
 > `cd your/project && zc` — one command to launch a full IDE workspace with Neovim, a terminal, and an AI assistant side by side.
@@ -42,7 +42,7 @@ This is a **fully portable development environment** that can be deployed on any
 
 ### The `zc` Workspace
 
-Running `zc` (or `code /path/to/project`) launches a purpose-built Zellij layout:
+Running `cd /path/to/project` and `zc` launches a purpose-built Zellij layout:
 
 ```
 ┌──────────────────────┬────────────┐
@@ -57,7 +57,7 @@ Running `zc` (or `code /path/to/project`) launches a purpose-built Zellij layout
 
 ### The `zd` Workspace
 
-Running `zd` launches a simpler layout for general-purpose terminal work:
+Running `cd /path/to/project` and `zd` launches a simpler layout for general-purpose terminal work:
 
 ```
 ┌──────────────────────┬────────────┐
