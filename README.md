@@ -194,6 +194,14 @@ The repo includes a bidirectional sync system:
 
 Changed files are backed up automatically before being overwritten. Identical files are skipped.
 
+**Tip:** You can automate backups with a cron job:
+
+```bash
+# Sync configs daily at midnight
+crontab -e
+0 0 * * * /path/to/dev-environment/sync-configs.sh --no-push >> /tmp/sync-configs.log 2>&1
+```
+
 ## Tech Stack This Was Built For
 
 This environment is optimized for full-stack JavaScript/TypeScript development:
