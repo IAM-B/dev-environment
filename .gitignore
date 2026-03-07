@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+bun.lock
+
+# Neovim generated files
+configs/nvim/lazy-lock.json
+configs/nvim/.luarc.json
+configs/nvim/plugin/
+configs/nvim/lazy/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+*.swp
+*.swo
+*~
+.claude/
+
+# Backups created by install scripts
+*.bak
+*.bak.*
