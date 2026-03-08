@@ -144,7 +144,8 @@ dev-environment/
 ├── install.sh                  # Main installer (orchestrates everything)
 ├── install-deps.sh             # System dependencies (Neovim, Node, Zellij...)
 ├── install-configs.sh          # Config deployment with smart diffing & backups
-├── sync-configs.sh             # Reverse sync: machine → repo (for updates)
+├── sync-configs.sh             # Two-way sync: repo ↔ machine (main machine)
+├── update.sh                   # Auto-update: pull + apply configs (secondary machines)
 │
 ├── configs/
 │   ├── nvim/                   # Neovim configuration (Lua)
@@ -180,30 +181,43 @@ dev-environment/
 
 ## Keeping Configs in Sync
 
-The repo includes a two-way sync system. `sync-configs.sh` handles the full cycle automatically:
+Two scripts handle config synchronization depending on the machine role:
+
+### Main machine (where you edit configs)
+
+`sync-configs.sh` handles the full cycle automatically:
 
 1. **Applies** repo changes to your machine (`install-configs.sh`)
 2. **Captures** local config changes back to the repo
 3. **Commits and pushes** if anything changed
 
 ```bash
-# Full two-way sync (repo ↔ machine)
 ./sync-configs.sh
 ./sync-configs.sh --no-push    # Sync without pushing to remote
 ./sync-configs.sh --dry-run    # Preview what would change
-
-# Deploy only: repo → machine (no git operations)
-./install-configs.sh
 ```
 
-Changed files are backed up automatically before being overwritten. Identical files are skipped.
+### Secondary machines (receive updates only)
 
-**Automate with cron** (recommended):
+`update.sh` pulls the latest changes and applies them:
+
+```bash
+./update.sh                    # Pull + apply configs
+./update.sh --dry-run          # Preview what would change
+```
+
+> **Note:** `install.sh` automatically sets up a daily cron job running `update.sh` at noon. No manual cron setup needed on secondary machines.
+
+### Main machine: manual cron setup
+
+On your main machine, set up the sync cron manually:
 
 ```bash
 crontab -e
 0 12 * * * /bin/bash /path/to/dev-environment/sync-configs.sh >> ~/.local/log/sync-configs.log 2>&1
 ```
+
+Changed files are backed up automatically before being overwritten. Identical files are skipped.
 
 ## Tech Stack This Was Built For
 

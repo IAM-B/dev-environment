@@ -98,6 +98,26 @@ install_blesh() {
     fi
 }
 
+install_cron() {
+    local cron_cmd="/bin/bash $SCRIPT_DIR/update.sh >> $HOME/.local/log/update-configs.log 2>&1"
+    local cron_entry="0 12 * * * $cron_cmd"
+
+    # Check if cron job already exists
+    if crontab -l 2>/dev/null | grep -qF "update.sh"; then
+        log_info "Auto-update cron job already installed"
+        return 0
+    fi
+
+    # Create log directory
+    mkdir -p "$HOME/.local/log"
+
+    # Add cron job (preserve existing entries)
+    (crontab -l 2>/dev/null; echo "$cron_entry") | crontab -
+    log_info "Cron job installed: daily at 12:00 (update.sh)"
+    log_info "Logs: ~/.local/log/update-configs.log"
+    add_installed "Auto-update cron job"
+}
+
 configure_zellij() {
     log_info "Configuring Zellij..."
     if [ -f ~/.config/zellij/config.kdl ]; then
@@ -168,7 +188,7 @@ main() {
     echo ""
 
     # Step 1: System dependencies
-    log_step "1/5 - System dependencies"
+    log_step "1/6 - System dependencies"
     if [ "$skip_deps" = false ]; then
         local deps_args=""
         [ "$with_kitty" = true ] && deps_args="--with-kitty"
@@ -180,7 +200,7 @@ main() {
 
     # Step 2: Configurations
     echo ""
-    log_step "2/5 - Configuration files"
+    log_step "2/6 - Configuration files"
     if [ "$skip_configs" = false ]; then
         bash "$SCRIPT_DIR/install-configs.sh"
         add_installed "Configuration files"
@@ -190,7 +210,7 @@ main() {
 
     # Step 3: Neovim plugins
     echo ""
-    log_step "3/5 - Plugins Neovim"
+    log_step "3/6 - Plugins Neovim"
     if [ "$skip_nvim" = false ]; then
         if check_nvim; then
             install_nvim_plugins
@@ -201,14 +221,19 @@ main() {
 
     # Step 4: Additional tools
     echo ""
-    log_step "4/5 - Additional tools"
+    log_step "4/6 - Additional tools"
     install_fzf
     install_blesh
     configure_zellij
 
-    # Step 5: Summary
+    # Step 5: Auto-update cron job
     echo ""
-    log_step "5/5 - Summary"
+    log_step "5/6 - Auto-update cron job"
+    install_cron
+
+    # Step 6: Summary
+    echo ""
+    log_step "6/6 - Summary"
     print_summary
 }
 
