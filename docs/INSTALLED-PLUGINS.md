@@ -197,6 +197,7 @@ HISTFILESIZE=10000
 | ------------- | --------------------------------- |
 | `Space`       | Leader                            |
 | `Space+e`     | NvimTree                          |
+| `Space+ep`    | NvimTree: back to project root    |
 | `Space+ff`    | Telescope (files)                 |
 | `Space+fg`    | Telescope (grep)                  |
 | `Space+w`     | Save                              |

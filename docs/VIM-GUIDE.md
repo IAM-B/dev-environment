@@ -154,6 +154,7 @@ Built-in file explorer (replaces NERDTree).
 ```
 <Space>e     # Open/close NvimTree
 <Space>E     # Locate current file
+<Space>ep    # Back to project root (cwd)
 ```
 
 #### Navigation in NvimTree
@@ -187,6 +188,7 @@ r             # Rename
 | `-`       | Go up           | Parent becomes root                   |
 | `W`       | Collapse all    | Closes all open folders               |
 | `E`       | Expand all      | Opens all folders                     |
+| `<Space>ep` | Project root  | Reset tree root to cwd (project root) |
 
 ---
 
@@ -841,6 +843,7 @@ Configure the font in Kitty (`~/.config/kitty/kitty.conf`).
 | **Telescope**  | `<Space>fm`  | Keymaps                           |
 | **NvimTree**   | `<Space>e`   | Toggle                            |
 | **NvimTree**   | `<Space>E`   | Locate file                       |
+| **NvimTree**   | `<Space>ep`  | Back to project root              |
 | **LSP**        | `gd`         | Definition                        |
 | **LSP**        | `gr`         | References                        |
 | **LSP**        | `<Space>rn`  | Rename                            |
@@ -871,6 +874,7 @@ FILES:
   <Space>fg    → Search text
   <Space>fb    → Buffers
   <Space>e     → NvimTree
+  <Space>ep    → NvimTree: back to project root
   <Space>w     → Save
   <Space>x     → Save and quit
 
