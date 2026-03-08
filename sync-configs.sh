@@ -2,7 +2,10 @@
 # ============================================
 # CONFIGURATION SYNCHRONIZATION
 # ============================================
-# Copies configs from ~/ to the repo and pushes
+# Two-way sync between ~/ and the repo:
+#   1. Applies repo changes to ~/ (install-configs.sh)
+#   2. Copies ~/ configs back to the repo
+#   3. Commits and pushes if changes detected
 #
 # Usage:
 #   ./sync-configs.sh           # Sync + commit + push
@@ -114,7 +117,18 @@ echo "  CONFIG SYNCHRONIZATION"
 echo "========================================"
 echo ""
 
-# Sync files
+# Step 1: Apply repo changes to local machine
+# (catches edits made directly in the repo)
+log_info "Step 1/2: Applying repo configs to ~/..."
+if [ "$DRY_RUN" = true ]; then
+    bash "$REPO_DIR/install-configs.sh" --dry-run --no-backup
+else
+    bash "$REPO_DIR/install-configs.sh" --no-backup
+fi
+echo ""
+
+# Step 2: Sync local configs back to the repo
+log_info "Step 2/2: Syncing ~/ configs to repo..."
 sync_file "$HOME/.bashrc" "$REPO_DIR/configs/bash/bashrc"
 sync_file "$HOME/.config/zellij/config.kdl" "$REPO_DIR/configs/zellij/config.kdl"
 sync_file "$HOME/.config/zellij/layouts" "$REPO_DIR/configs/zellij/layouts"

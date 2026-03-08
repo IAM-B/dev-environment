@@ -180,26 +180,29 @@ dev-environment/
 
 ## Keeping Configs in Sync
 
-The repo includes a bidirectional sync system:
+The repo includes a two-way sync system. `sync-configs.sh` handles the full cycle automatically:
+
+1. **Applies** repo changes to your machine (`install-configs.sh`)
+2. **Captures** local config changes back to the repo
+3. **Commits and pushes** if anything changed
 
 ```bash
-# Deploy: repo → machine
-./install-configs.sh
-
-# Backup: machine → repo (auto-commits changes)
+# Full two-way sync (repo ↔ machine)
 ./sync-configs.sh
 ./sync-configs.sh --no-push    # Sync without pushing to remote
 ./sync-configs.sh --dry-run    # Preview what would change
+
+# Deploy only: repo → machine (no git operations)
+./install-configs.sh
 ```
 
 Changed files are backed up automatically before being overwritten. Identical files are skipped.
 
-**Tip:** You can automate backups with a cron job:
+**Automate with cron** (recommended):
 
 ```bash
-# Sync configs daily at midnight
 crontab -e
-0 0 * * * /path/to/dev-environment/sync-configs.sh --no-push >> /tmp/sync-configs.log 2>&1
+0 12 * * * /bin/bash /path/to/dev-environment/sync-configs.sh >> ~/.local/log/sync-configs.log 2>&1
 ```
 
 ## Tech Stack This Was Built For
