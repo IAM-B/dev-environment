@@ -12,6 +12,9 @@
 
 set -e
 
+# Ensure PATH is set for cron environment
+export PATH="/usr/local/bin:/usr/bin:/bin:$PATH"
+
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 GREEN='\033[0;32m'
@@ -36,8 +39,8 @@ sync_file() {
     local target="$2"
     
     if [ ! -f "$source" ] && [ ! -d "$source" ]; then
-        log_warn "Source not found: $source"
-        return 1
+        log_warn "Source not found: $source (skipping)"
+        return 0
     fi
     
     if [ "$DRY_RUN" = true ]; then
@@ -47,7 +50,7 @@ sync_file() {
     
     if [ -d "$source" ]; then
         mkdir -p "$target"
-        cp -r "$source"/* "$target/" 2>/dev/null || true
+        rsync -a --delete "$source/" "$target/"
     else
         mkdir -p "$(dirname "$target")"
         cp "$source" "$target"
@@ -62,8 +65,8 @@ sync_nvim() {
     local target="$REPO_DIR/configs/nvim"
     
     if [ ! -d "$source" ]; then
-        log_warn "Source not found: $source"
-        return 1
+        log_warn "Source not found: $source (skipping)"
+        return 0
     fi
     
     if [ "$DRY_RUN" = true ]; then
@@ -87,8 +90,8 @@ sync_opencode() {
     local target="$REPO_DIR/configs/opencode"
 
     if [ ! -d "$source" ]; then
-        log_warn "Source not found: $source"
-        return 1
+        log_warn "Source not found: $source (skipping)"
+        return 0
     fi
 
     if [ "$DRY_RUN" = true ]; then
@@ -97,7 +100,7 @@ sync_opencode() {
     fi
 
     mkdir -p "$target"
-    rsync -av \
+    rsync -av --delete \
         --exclude='node_modules/' \
         --exclude='bun.lock' \
         "$source/" "$target/" > /dev/null
@@ -131,8 +134,8 @@ echo ""
 # Git operations
 cd "$REPO_DIR"
 
-# Check if there are changes
-if git diff --quiet configs/ && git diff --cached --quiet configs/; then
+# Check if there are changes (including untracked files)
+if git diff --quiet configs/ && git diff --cached --quiet configs/ && [ -z "$(git ls-files --others --exclude-standard configs/)" ]; then
     log_info "No changes detected"
     exit 0
 fi
