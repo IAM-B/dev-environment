@@ -300,27 +300,7 @@ code() {
     fi
 }
 
-# fzf_history from zshrc (adapted for bash)
-fzf_history() {
-    local cmd
-    cmd=$(history | fzf +s --tac | sed 's/^[ ]*[0-9]*[ ]*//')
-    if [[ -n $cmd ]]; then
-        # Ignore fh alias if selected
-        if [[ "$cmd" == "fh" ]] || [[ "$cmd" == "fzf_history" ]]; then
-            return
-        fi
-        # Clean the command
-        cmd=$(echo "$cmd" | sed 's/^[ \t]*//')
-        # Put in the buffer
-        READLINE_LINE="$cmd"
-        READLINE_POINT=${#cmd}
-    fi
-}
-
-# Bind Ctrl+R for fzf_history (zsh equivalent)
-bind -x '"\C-r": fzf_history'
-
-# History configuration (zsh equivalent)
+# History configuration
 HISTSIZE=10000
 HISTFILESIZE=10000
 HISTCONTROL=ignoredups:erasedups
@@ -336,8 +316,6 @@ if command -v figlet &> /dev/null && command -v lolcat &> /dev/null; then
     figlet -f small -c "YOUR ONLY LIMIT IS YOU" | lolcat
 fi
 
-[ -f ~/.fzf.bash ] && source ~/.fzf.bash
-
 # ============================================
 # BLE.SH - Bash Line Editor (autosuggestions)
 # ============================================
@@ -352,4 +330,9 @@ elif [[ -f ~/.blesh/out/ble.sh ]]; then
     bleopt complete_auto_delay=100
     ble-face auto_complete='fg=245,underline'
 fi
+
+# Load fzf AFTER ble.sh so it can detect BLE_VERSION
+# and use ble.sh's fzf integration modules for Ctrl+R etc.
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash
+
 export PATH="$HOME/.cargo/bin:$PATH"

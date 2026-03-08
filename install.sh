@@ -67,8 +67,10 @@ install_fzf() {
         log_info "Installing fzf..."
         rm -rf ~/.fzf
         git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
-        # Do not run the install script which overwrites .fzf.bash
-        # The .fzf.bash file is managed by install-configs.sh
+        # Install binary only (no shell config overwrite)
+        # This downloads the fzf binary to ~/.fzf/bin/ and generates
+        # the shell scripts in ~/.fzf/shell/ (key-bindings, completion)
+        ~/.fzf/install --bin
         add_installed "fzf (git)"
     else
         log_info "fzf already installed"
