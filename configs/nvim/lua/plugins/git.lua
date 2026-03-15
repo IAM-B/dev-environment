@@ -129,7 +129,7 @@ return {
         end,
       })
 
-      -- Dracula colors
+      -- Dracula colors - unstaged (working tree changes)
       vim.api.nvim_set_hl(0, "GitSignsAdd", { fg = "#50fa7b" })
       vim.api.nvim_set_hl(0, "GitSignsChange", { fg = "#ffb86c" })
       vim.api.nvim_set_hl(0, "GitSignsDelete", { fg = "#ff5555" })
@@ -139,6 +139,17 @@ return {
       vim.api.nvim_set_hl(0, "GitSignsAddNr", { fg = "#50fa7b" })
       vim.api.nvim_set_hl(0, "GitSignsChangeNr", { fg = "#ffb86c" })
       vim.api.nvim_set_hl(0, "GitSignsDeleteNr", { fg = "#ff5555" })
+
+      -- Dracula colors - staged (muted/subtle)
+      vim.api.nvim_set_hl(0, "GitSignsStagedAdd", { fg = "#2d7a45" })
+      vim.api.nvim_set_hl(0, "GitSignsStagedChange", { fg = "#8a6340" })
+      vim.api.nvim_set_hl(0, "GitSignsStagedDelete", { fg = "#8a3030" })
+      vim.api.nvim_set_hl(0, "GitSignsStagedAddLn", { bg = "#1e3320" })
+      vim.api.nvim_set_hl(0, "GitSignsStagedChangeLn", { bg = "#33291e" })
+      vim.api.nvim_set_hl(0, "GitSignsStagedDeleteLn", { bg = "#331e1e" })
+      vim.api.nvim_set_hl(0, "GitSignsStagedAddNr", { fg = "#2d7a45" })
+      vim.api.nvim_set_hl(0, "GitSignsStagedChangeNr", { fg = "#8a6340" })
+      vim.api.nvim_set_hl(0, "GitSignsStagedDeleteNr", { fg = "#8a3030" })
     end,
   },
 }
