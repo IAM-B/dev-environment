@@ -60,6 +60,9 @@ local function wrap_tailwind_line(bufnr, lnum)
   local indent, before, classes, after = line:match("^(%s*)(.-class=\")(.-)(\".*)$")
   if not indent or not classes then return false end
 
+  -- Skip lines with Edge expressions inside class to avoid breaking {{ }}
+  if classes:find("{{") then return false end
+
   -- Calculate base width (indentation + class=")
   local base_indent = indent .. string.rep(" ", #before - #indent)
   local first_line_max = tw_max_width - #indent - #before

@@ -196,10 +196,13 @@ return {
           markdown = { "prettier" },
           svelte = { "prettier" },
         },
-        format_on_save = {
-          timeout_ms = 3000,
-          lsp_format = "fallback",
-        },
+        format_on_save = function(bufnr)
+          -- Edge templates: no auto-format (Prettier breaks {{ }} expressions)
+          if vim.bo[bufnr].filetype == "edge" then
+            return false
+          end
+          return { timeout_ms = 3000, lsp_format = "fallback" }
+        end,
       })
     end,
   },

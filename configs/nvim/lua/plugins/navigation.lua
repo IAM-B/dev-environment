@@ -149,7 +149,7 @@ return {
         },
         window = {
           width = 10,
-          winblend = 15,
+          winblend = 0,
           side = "right",
           show_integration_count = false,
         },
