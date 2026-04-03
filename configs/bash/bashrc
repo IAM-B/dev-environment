@@ -136,6 +136,7 @@ export PATH="$HOME/.opencode/bin:$PATH"
 
 # Alias vim -> nvim
 alias vim='nvim'
+alias lvim='NVIM_APPNAME=nvim-lazyvim nvim'  # LazyVim (config separee)
 
 # Vim help (moved to gitCloud)
 alias vimdoc='cd ~/dev-environment/docs && ls -la'

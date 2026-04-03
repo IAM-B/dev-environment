@@ -24,14 +24,18 @@ return {
       -- Groupes de raccourcis
       wk.add({
         { "<leader>b", group = "Buffers" },
+        { "<leader>c", group = "Code (LSP)" },
+        { "<leader>d", group = "Debug (DAP)" },
         { "<leader>f", group = "Find (Telescope)" },
         { "<leader>g", group = "Git" },
-        { "<leader>h", group = "Hunks (git)" },
-        { "<leader>m", group = "Minimap" },
+        { "<leader>h", group = "Harpoon" },
+        { "<leader>m", group = "Minimap / Markdown" },
         { "<leader>o", group = "Opencode" },
-        { "<leader>y", group = "Yank path" },
-        { "<leader>c", group = "Code (LSP)" },
+        { "<leader>p", group = "Persistence (sessions)" },
+        { "<leader>s", group = "Search & Replace" },
         { "<leader>t", group = "Tailwind" },
+        { "<leader>x", group = "Trouble (diagnostics)" },
+        { "<leader>y", group = "Yank path" },
       })
     end,
   },

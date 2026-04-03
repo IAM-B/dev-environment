@@ -44,12 +44,33 @@ return {
           lualine_y = { "progress" },
           lualine_z = { "location" },
         },
-        tabline = {
-          lualine_a = { "buffers" },
-          lualine_z = { "tabs" },
-        },
+        -- tabline geree par bufferline
       })
     end,
+  },
+
+  -- Bufferline (replaces lualine tabline - better tabs with icons, close buttons)
+  {
+    "akinsho/bufferline.nvim",
+    version = "*",
+    dependencies = { "nvim-tree/nvim-web-devicons" },
+    event = "VeryLazy",
+    opts = {
+      options = {
+        diagnostics = "nvim_lsp",
+        offsets = {
+          {
+            filetype = "neo-tree",
+            text = "Explorer",
+            highlight = "Directory",
+            separator = true,
+          },
+        },
+        separator_style = "thin",
+        show_buffer_close_icons = true,
+        show_close_icon = false,
+      },
+    },
   },
 
   -- Icons (replaces vim-devicons)

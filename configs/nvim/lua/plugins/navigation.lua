@@ -1,65 +1,62 @@
 -- ============================================
--- NAVIGATION - nvim-tree + telescope + mini.map + tmux
+-- NAVIGATION - neo-tree + telescope + mini.map + tmux
 -- ============================================
 
 return {
-  -- NvimTree (replaces NERDTree)
+  -- Neo-tree (replaces nvim-tree - better UI, git status inline)
   {
-    "nvim-tree/nvim-tree.lua",
-    dependencies = { "nvim-tree/nvim-web-devicons" },
+    "nvim-neo-tree/neo-tree.nvim",
+    branch = "v3.x",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "nvim-tree/nvim-web-devicons",
+      "MunifTanjim/nui.nvim",
+    },
     config = function()
       -- Disable netrw
       vim.g.loaded_netrw = 1
       vim.g.loaded_netrwPlugin = 1
 
-      require("nvim-tree").setup({
-        view = {
-          width = 30,
-          side = "left",
-        },
-        renderer = {
-          icons = {
-            show = {
-              git = true,
-              file = true,
-              folder = true,
-              folder_arrow = true,
-            },
-            glyphs = {
-              git = {
-                unstaged = "~",
-                staged = "+",
-                untracked = "?",
-                renamed = ">",
-                unmerged = "=",
-                deleted = "-",
-                ignored = "i",
-              },
-            },
+      require("neo-tree").setup({
+        close_if_last_window = true,
+        filesystem = {
+          follow_current_file = { enabled = true },
+          use_libuv_file_watcher = true,
+          filtered_items = {
+            hide_dotfiles = false,
+            hide_gitignored = false,
           },
         },
-        filters = {
-          dotfiles = false,
+        window = {
+          width = 30,
+          position = "left",
+          mappings = {
+            ["<space>"] = "none", -- ne pas confondre avec leader
+          },
         },
-        git = {
-          enable = true,
-          ignore = false,
-        },
-        actions = {
-          open_file = {
-            quit_on_open = false,
+        default_component_configs = {
+          git_status = {
+            symbols = {
+              unstaged = "~",
+              staged = "+",
+              untracked = "?",
+              renamed = ">",
+              unmerged = "=",
+              deleted = "-",
+              ignored = "i",
+            },
           },
         },
       })
 
-      -- Keymaps same as vimrc
-      vim.keymap.set("n", "<leader>e", ":NvimTreeToggle<CR>", { desc = "Toggle NvimTree" })
-      vim.keymap.set("n", "<leader>E", ":NvimTreeFindFile<CR>", { desc = "Find file in NvimTree" })
+      -- Memes raccourcis qu'avant
+      vim.keymap.set("n", "<leader>e", "<cmd>Neotree toggle<cr>", { desc = "Toggle Neo-tree" })
+      vim.keymap.set("n", "<leader>E", "<cmd>Neotree reveal<cr>", { desc = "Find file in Neo-tree" })
       vim.keymap.set("n", "<leader>ep", function()
-        require("nvim-tree.api").tree.change_root(vim.fn.getcwd())
-      end, { desc = "NvimTree: back to project root" })
+        require("neo-tree.command").execute({ dir = vim.fn.getcwd() })
+      end, { desc = "Neo-tree: back to project root" })
 
-      -- Open NvimTree at startup if no file
+      -- Ouvrir Neo-tree au demarrage si pas de fichier
       vim.api.nvim_create_autocmd("VimEnter", {
         callback = function(data)
           local no_name = data.file == "" and vim.bo[data.buf].buftype == ""
@@ -68,7 +65,7 @@ return {
             if directory then
               vim.cmd.cd(data.file)
             end
-            require("nvim-tree.api").tree.open()
+            require("neo-tree.command").execute({ toggle = true })
           end
         end,
       })
@@ -120,72 +117,24 @@ return {
     end,
   },
 
-  -- mini.map (replaces minimap.vim - pure Lua, more stable)
+  -- minimap.vim (uses code-minimap in Rust, real split)
   {
-    "echasnovski/mini.map",
-    version = false,
-    dependencies = { "lewis6991/gitsigns.nvim" },
+    "wfxr/minimap.vim",
     config = function()
-      local map = require("mini.map")
+      vim.g.minimap_width = 10
+      vim.g.minimap_auto_start = 1
+      vim.g.minimap_auto_start_win_enter = 1
+      vim.g.minimap_git_colors = 1
+      vim.g.minimap_highlight_search = 1
+      vim.g.minimap_close_filetypes = {
+        "neo-tree", "fugitive", "git", "gitcommit",
+        "TelescopePrompt", "lazy", "mason", "help",
+        "qf", "terminal", "trouble", "noice",
+      }
 
-      -- Highlights for git integrations in mini.map
-      vim.api.nvim_set_hl(0, "MiniMapSymbolGitAdd", { fg = "#50fa7b" })
-      vim.api.nvim_set_hl(0, "MiniMapSymbolGitChange", { fg = "#ffb86c" })
-      vim.api.nvim_set_hl(0, "MiniMapSymbolGitDelete", { fg = "#ff5555" })
-
-      map.setup({
-        symbols = {
-          encode = map.gen_encode_symbols.dot("4x2"),
-        },
-        integrations = {
-          map.gen_integration.builtin_search(),
-          map.gen_integration.diagnostic(),
-          map.gen_integration.gitsigns({
-            untracked = true,
-            add = "MiniMapSymbolGitAdd",
-            change = "MiniMapSymbolGitChange",
-            delete = "MiniMapSymbolGitDelete",
-          }),
-        },
-        window = {
-          width = 10,
-          winblend = 0,
-          side = "right",
-          show_integration_count = false,
-        },
-      })
-
-      -- Auto open on code files
-      vim.api.nvim_create_autocmd("BufEnter", {
-        callback = function()
-          local ft = vim.bo.filetype
-          local excluded = {
-            "NvimTree", "fugitive", "git", "gitcommit",
-            "TelescopePrompt", "lazy", "mason", "help",
-            "qf", "terminal", "",
-          }
-          for _, v in ipairs(excluded) do
-            if ft == v then return end
-          end
-          if vim.bo.buftype == "" then
-            map.open()
-          end
-        end,
-      })
-
-      -- Refresh minimap when gitsigns updates
-      vim.api.nvim_create_autocmd("User", {
-        pattern = "GitSignsUpdate",
-        callback = function()
-          pcall(map.refresh, {}, { lines = false, scrollbar = false })
-        end,
-      })
-
-      -- Keymaps (same as before)
-      vim.keymap.set("n", "<leader>mm", map.toggle, { desc = "Toggle Minimap" })
-      vim.keymap.set("n", "<leader>mc", map.close, { desc = "Close Minimap" })
-      vim.keymap.set("n", "<leader>mr", map.refresh, { desc = "Refresh Minimap" })
-      vim.keymap.set("n", "<leader>mf", map.toggle_focus, { desc = "Focus Minimap" })
+      vim.keymap.set("n", "<leader>mm", "<cmd>MinimapToggle<cr>", { desc = "Toggle Minimap" })
+      vim.keymap.set("n", "<leader>mc", "<cmd>MinimapClose<cr>", { desc = "Close Minimap" })
+      vim.keymap.set("n", "<leader>mr", "<cmd>MinimapRefresh<cr>", { desc = "Refresh Minimap" })
     end,
   },
 

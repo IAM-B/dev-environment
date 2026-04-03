@@ -10,9 +10,8 @@ return {
     config = function()
       -- Global keymaps
       vim.keymap.set("n", "<leader>gs", function()
-        -- Close NvimTree before opening Fugitive
-        local ok, api = pcall(require, "nvim-tree.api")
-        if ok then api.tree.close() end
+        -- Close Neo-tree before opening Fugitive
+        vim.cmd("Neotree close")
         vim.cmd("vert Git")
       end, { desc = "Git status" })
       vim.keymap.set("n", "<leader>gd", ":Gvdiffsplit<CR>", { desc = "Git diff" })
@@ -37,12 +36,8 @@ return {
               local git_dir = vim.fn.FugitiveWorkTree()
               local full_path = git_dir .. "/" .. path
               if vim.fn.isdirectory(full_path) == 1 then
-                -- It's a directory, open in NvimTree
-                local ok_tree, api = pcall(require, "nvim-tree.api")
-                if ok_tree then
-                  api.tree.open()
-                  api.tree.find_file(full_path)
-                end
+                -- It's a directory, open in Neo-tree
+                require("neo-tree.command").execute({ reveal_file = full_path })
                 return
               end
             end
@@ -63,7 +58,7 @@ return {
               local target_win = nil
               for _, win in ipairs(vim.api.nvim_list_wins()) do
                 local ft = vim.bo[vim.api.nvim_win_get_buf(win)].filetype
-                if ft ~= "fugitive" and ft ~= "NvimTree" and ft ~= "minimap" then
+                if ft ~= "fugitive" and ft ~= "neo-tree" and ft ~= "minimap" then
                   target_win = win
                   break
                 end

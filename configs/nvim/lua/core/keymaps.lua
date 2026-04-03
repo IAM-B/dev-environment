@@ -21,14 +21,14 @@ map("n", "L", "$", { desc = "End of line" })
 -- J/K = 5 lines, except in special buffers (fugitive, help, etc.)
 local function smart_5j()
   local ft = vim.bo.filetype
-  if ft == "fugitive" or ft == "help" or ft == "qf" or ft == "NvimTree" then
+  if ft == "fugitive" or ft == "help" or ft == "qf" or ft == "neo-tree" then
     return "j"
   end
   return "5j"
 end
 local function smart_5k()
   local ft = vim.bo.filetype
-  if ft == "fugitive" or ft == "help" or ft == "qf" or ft == "NvimTree" then
+  if ft == "fugitive" or ft == "help" or ft == "qf" or ft == "neo-tree" then
     return "k"
   end
   return "5k"
@@ -108,6 +108,9 @@ map("n", "<leader>yf", function()
   vim.fn.setreg("+", vim.fn.expand("%:t"))
   print("Filename copied")
 end, { desc = "Copy filename" })
+
+-- Lazy plugin manager
+map("n", "<leader>L", "<cmd>Lazy<CR>", { desc = "Lazy (plugins)" })
 
 -- Opencode integration
 map("n", "<leader>oo", ":!opencode %:p<CR>", { desc = "Open in Opencode" })

@@ -18,7 +18,7 @@ hi EdgeOrange guifg=#FFB86C
 hi EdgeCyan guifg=#8BE9FD
 
 " === Edge comments: {{-- comment --}} (multiline) ===
-syn region edgeComment start="{{--" end="--}}" containedin=ALL
+syn region edgeComment start="{{--" end="--}}" containedin=ALL contains=NONE
 hi def link edgeComment Comment
 
 " === Edge safe output: {{ expression }} ===
@@ -34,12 +34,12 @@ syn cluster edgeJsExpr contains=edgeJsStringSingle,edgeJsStringDouble,edgeJsTemp
 
 " === Edge tag: @directive alone (without parentheses) ===
 " Match @end, @else, @super, @!component, etc.
-syn match edgeTag "@!\?\w\+" containedin=ALL
+syn match edgeTag "@!\?\w\+" containedin=ALLBUT,edgeComment
 hi def link edgeTag EdgePurple
 
 " === Edge tag arguments: @tag(...) - multiline, with JS sub-highlighting ===
 " Support @tag() and @!tag() (self-closing components)
-syn region edgeTagArgs matchgroup=EdgePurple start="@!\?\w\+\s*(" end=")" containedin=ALL contains=@edgeJsExpr,edgeNestedParen,edgeNestedBrace
+syn region edgeTagArgs matchgroup=EdgePurple start="@!\?\w\+\s*(" end=")" containedin=ALLBUT,edgeComment contains=@edgeJsExpr,edgeNestedParen,edgeNestedBrace
 hi def link edgeTagArgs EdgePink
 
 " === Nested parentheses ===

@@ -39,6 +39,11 @@ opt.ignorecase = true
 opt.smartcase = true
 opt.wrapscan = true
 
+-- Word wrap (retour a la ligne visuel, ne modifie pas le fichier)
+opt.wrap = true
+opt.linebreak = true       -- coupe aux mots, pas au milieu d'un mot
+opt.breakindent = true     -- garde l'indentation sur les lignes wrappees
+
 -- Navigation
 opt.scrolloff = 8
 opt.sidescrolloff = 8

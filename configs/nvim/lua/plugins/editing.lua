@@ -13,14 +13,11 @@ return {
     end,
   },
 
-  -- Comment.nvim (replaces vim-commentary)
+  -- ts-comments.nvim (replaces Comment.nvim - better JSX/TSX support)
   {
-    "numToStr/Comment.nvim",
+    "folke/ts-comments.nvim",
     event = "VeryLazy",
-    config = function()
-      require("Comment").setup({})
-      -- gcc and gc work by default
-    end,
+    opts = {},
   },
 
   -- nvim-autopairs (replaces auto-pairs)
