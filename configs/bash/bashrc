@@ -304,10 +304,9 @@ img() {
 # Launch zellij with code layout in the current directory
 code() {
     if [ -d "$1" ]; then
-        cd "$1" && zellij --layout code
-    else
-        zellij --layout code
+        cd "$1"
     fi
+    zellij --session "code-${PWD##*/}-$(date +%H%M)" --new-session-with-layout code
 }
 
 # History configuration
