@@ -8,23 +8,17 @@ layout {
             plugin location="zellij:status-bar"
         }
     }
-    
-    tab name="code" {
+
+    tab name="code" focus=true {
         pane split_direction="vertical" {
-            pane size="65%" command="bash" {
-                args "-ic" "NVIM_APPNAME=nvim-lazyvim nvim"
-                // LazyVim - main code pane
+            pane size="65%" {
+                command "bash"
+                args "-c" "NVIM_APPNAME=nvim-lazyvim nvim"
                 focus true
             }
-            pane split_direction="horizontal" size="35%" {
-                pane {
-                    // Terminal for tests, git, npm, etc.
-                }
-                pane {
-                    // Opencode - AI assistant
-                    command "bash"
-                    args "-c" "$HOME/.opencode/bin/opencode"
-                }
+            pane size="35%" {
+                command "bash"
+                args "-c" "claude --resume"
             }
         }
     }

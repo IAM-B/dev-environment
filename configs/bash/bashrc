@@ -131,7 +131,7 @@ alias taskmaster='task-master'
 export PATH="$HOME/.opencode/bin:$PATH"
 
 # ============================================
-# ZELLIJ ALIASES - Vim + Opencode Workflow
+# ZELLIJ ALIASES - LazyVim + Claude Workflow
 # ============================================
 
 # Alias vim -> nvim
@@ -145,13 +145,22 @@ alias vimguide='nvim ~/dev-environment/docs/README-vim-zellij-oc.md'
 alias vimshort='head -80 ~/.config/zellij/SHORTCUTS.md'
 alias bshort='nvim ~/dev-environment/docs/BASH-SHORTCUTS.md'
 
-# Zellij sessions
-alias zc='zellij --layout code'          # Dev session (vim + opencode)
-alias zd='zellij --layout dev'           # Classic dev session
-alias za='zellij attach'                 # Attach existing session
-alias zl='zellij list-sessions'          # List sessions
-alias zk='zellij kill-session'           # Kill a session
-alias zka='zellij delete-all-sessions'   # Kill all sessions
+# Zellij sessions - directory-based naming with timestamp
+# zc       → creates "code-DIRNAME-1423"
+# zc name  → attaches to existing session "name"
+zc() {
+  if [ -n "$1" ]; then zellij attach "$1"; else zellij --session "code-${PWD##*/}-$(date +%H%M)" --new-session-with-layout code; fi
+}
+zd() {
+  if [ -n "$1" ]; then zellij attach "$1"; else zellij --session "dev-${PWD##*/}-$(date +%H%M)" --new-session-with-layout dev; fi
+}
+za() {
+  if [ -n "$1" ]; then zellij attach "$1"; else zellij --session "agents-${PWD##*/}-$(date +%H%M)" --new-session-with-layout agents; fi
+}
+alias zat='zellij list-sessions'                                    # List sessions
+alias zl='zellij list-sessions'                                     # List sessions
+alias zk='zellij kill-session'                                      # Kill a session
+alias zka='zellij delete-all-sessions'                              # Kill all dead sessions
 
 # Zellij - quick utilities
 alias zr='zellij run --'                 # Run command in a new pane
@@ -311,10 +320,10 @@ if command -v starship &> /dev/null; then
     eval "$(starship init bash)"
 fi
 
-# Startup banner (from zshrc)
-if command -v figlet &> /dev/null && command -v lolcat &> /dev/null; then
-    figlet -f lean -c " IAMB" | lolcat
-    figlet -f small -c "YOUR ONLY LIMIT IS YOU" | lolcat
+# Startup banner - TokyoNight theme
+if command -v figlet &> /dev/null; then
+    figlet -f lean -c " IAMB" | sed "s/.*/$( printf '\033[1;38;2;122;162;247m' )&$( printf '\033[0m' )/"
+    figlet -f small -c "YOUR ONLY LIMIT IS YOU" | sed "s/.*/$( printf '\033[38;2;187;154;247m' )&$( printf '\033[0m' )/"
 fi
 
 # ============================================
