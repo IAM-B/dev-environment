@@ -11,8 +11,9 @@ layout {
     
     tab name="code" {
         pane split_direction="vertical" {
-            pane size="65%" {
-                // Vim - main code pane
+            pane size="65%" command="bash" {
+                args "-ic" "NVIM_APPNAME=nvim-lazyvim nvim"
+                // LazyVim - main code pane
                 focus true
             }
             pane split_direction="horizontal" size="35%" {
