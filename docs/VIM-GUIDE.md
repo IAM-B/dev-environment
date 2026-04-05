@@ -1,5 +1,9 @@
 # NEOVIM GUIDE - Complete Usage
 
+> **Note:** This guide covers general Vim usage and the legacy config.
+> For LazyVim-specific keybindings and features (primary config),
+> see [lazyvim-guide.md](lazyvim-guide.md).
+
 Complete guide to using Neovim as an IDE with all installed plugins.
 
 ---
@@ -10,18 +14,23 @@ Complete guide to using Neovim as an IDE with all installed plugins.
 2. [The 3 Vim modes](#2-the-3-vim-modes)
 3. [Essential plugins](#3-essential-plugins)
    - Telescope (fuzzy finder)
-   - NvimTree (file explorer)
+   - Neo-tree (file explorer)
+   - Harpoon (quick file switching)
    - Mason/native LSP + nvim-cmp (autocompletion)
    - Git (fugitive + gitsigns + quick navigation)
+   - Trouble (diagnostics panel)
    - Minimap (mini.map)
    - Snippets (LuaSnip)
-   - Advanced editing (Comment.nvim, nvim-surround, flash.nvim)
+   - Advanced editing (ts-comments, nvim-surround, flash.nvim)
+   - TODO Comments
+   - Search & Replace (grug-far)
+   - Debugger (nvim-dap)
+   - Sessions (persistence.nvim)
+   - Markdown preview
+   - Which-key (keymap help)
+   - Noice (notifications)
 4. [Navigation](#4-navigation)
 5. [Editing](#5-editing)
-   - Movement
-   - Copy/Paste
-   - Search and replace
-   - Comment/Surround
 6. [File management](#6-file-management)
 7. [Troubleshooting](#7-troubleshooting)
 8. [Quick reference](#8-quick-reference)
@@ -59,6 +68,10 @@ Navigation between Zellij panes: `Alt+h/j/k/l`
 
 Kitty is configured with a Nerd Font and built-in image support.
 
+### Discover shortcuts: Which-key
+
+Press `<Space>` (leader) and wait 300ms. A popup shows all available shortcuts organized by group. This is the best way to learn your config.
+
 ---
 
 ## 2. THE 3 VIM MODES
@@ -69,7 +82,7 @@ Neovim has 3 modes. **You must know which mode you are in!**
 
 - Default mode when opening
 - Type commands but NOT text
-- Cursor: block ▇
+- Cursor: block
 
 ### INSERT mode (writing)
 
@@ -87,18 +100,18 @@ Neovim has 3 modes. **You must know which mode you are in!**
 
 | Action          | Shortcut                | Description              |
 | --------------- | ----------------------- | ------------------------ |
-| NORMAL → INSERT | `i`                     | Insert before cursor     |
-| NORMAL → INSERT | `a`                     | Append after cursor      |
-| NORMAL → INSERT | `o`                     | Open line below          |
-| NORMAL → INSERT | `I`                     | Insert at line start     |
-| NORMAL → INSERT | `A`                     | Append at line end       |
-| NORMAL → INSERT | `O`                     | Open line above          |
-| INSERT → NORMAL | `Esc` or `jj` or `jk`  | Exit insert mode         |
-| NORMAL → VISUAL | `v`                     | Character selection      |
-| NORMAL → VISUAL | `V`                     | Line selection           |
-| NORMAL → VISUAL | `Ctrl+v`                | Block selection          |
+| NORMAL > INSERT | `i`                     | Insert before cursor     |
+| NORMAL > INSERT | `a`                     | Append after cursor      |
+| NORMAL > INSERT | `o`                     | Open line below          |
+| NORMAL > INSERT | `I`                     | Insert at line start     |
+| NORMAL > INSERT | `A`                     | Append at line end       |
+| NORMAL > INSERT | `O`                     | Open line above          |
+| INSERT > NORMAL | `Esc` or `jj` or `jk`  | Exit insert mode         |
+| NORMAL > VISUAL | `v`                     | Character selection      |
+| NORMAL > VISUAL | `V`                     | Line selection           |
+| NORMAL > VISUAL | `Ctrl+v`                | Block selection          |
 
-💡 **TIP**: Type `jj` quickly to exit insert mode (faster than Esc)
+**TIP**: Type `jj` quickly to exit insert mode (faster than Esc)
 
 ---
 
@@ -121,7 +134,7 @@ Fast file and text search (replaces fzf.vim).
 3. A window opens with all files
 4. Type the name (e.g.: `app.js` or just `app`)
 5. Telescope filters automatically
-6. Navigation: `Ctrl+j/k` or `↑` `↓`
+6. Navigation: `Ctrl+j/k`
 7. `Enter` to open, `Esc` to cancel
 
 #### Search within files (Live Grep)
@@ -141,34 +154,34 @@ Fast file and text search (replaces fzf.vim).
 <Space>fh    # File history
 <Space>fc    # Command list
 <Space>fm    # Keymap list
+<Space>ft    # Search TODOs in project
 ```
 
 ---
 
-### 3.2 NvimTree - File Explorer
+### 3.2 Neo-tree - File Explorer
 
-Built-in file explorer (replaces NERDTree).
+Modern file explorer with git status inline (replaces nvim-tree).
 
 #### Open/Close
 
 ```
-<Space>e     # Open/close NvimTree
-<Space>E     # Locate current file
+<Space>e     # Open/close Neo-tree
+<Space>E     # Locate current file in tree
 <Space>ep    # Back to project root (cwd)
 ```
 
-#### Navigation in NvimTree
+#### Navigation in Neo-tree
 
 | Action           | Shortcut        | Description                       |
 | ---------------- | --------------- | --------------------------------- |
-| Open file        | `Enter` or `o`  | Opens in the current window       |
-| Open in split    | `<C-x>`         | Horizontal split                  |
-| Open in vsplit   | `<C-v>`         | Vertical split                    |
-| Expand folder    | `o` or `Enter`  | Shows files                       |
-| Collapse folder  | `o` or `Enter`  | Hides files                       |
+| Open file        | `Enter`         | Opens in the current window       |
+| Expand folder    | `Enter`         | Shows files                       |
+| Collapse folder  | `Enter`         | Hides files                       |
 | Go up            | `-`             | Parent directory                  |
 | Refresh          | `R`             | Updates the tree                  |
-| Close            | `q`             | Closes NvimTree                   |
+| Close            | `q`             | Closes Neo-tree                   |
+| Help             | `?`             | Shows all shortcuts               |
 
 #### Create/Modify files
 
@@ -176,25 +189,41 @@ Built-in file explorer (replaces NERDTree).
 a             # Add a file or folder (add / at the end for a folder)
 d             # Delete
 r             # Rename
+m             # Move
+c             # Copy
+p             # Paste
 ```
 
-#### Quick navigation in NvimTree
+#### Features
 
-| Shortcut  | Action          | Description                           |
-| --------- | --------------- | ------------------------------------- |
-| `/`       | Search          | Type the file/folder name             |
-| `P`       | Root            | Go to the tree root                   |
-| `p`       | Parent          | Go to the file's parent folder        |
-| `-`       | Go up           | Parent becomes root                   |
-| `W`       | Collapse all    | Closes all open folders               |
-| `E`       | Expand all      | Opens all folders                     |
-| `<Space>ep` | Project root  | Reset tree root to cwd (project root) |
+- **Follows current file**: the tree highlights the file you're editing
+- **File watcher**: auto-refreshes when files change on disk
+- **Git status inline**: shows modified/staged/untracked status
+- **Git symbols**: `+` staged, `~` modified, `?` untracked, `-` deleted, `i` ignored
 
 ---
 
-### 3.3 Mason/Native LSP + nvim-cmp - LSP (Language Server Protocol)
+### 3.3 Harpoon - Quick File Switching
 
-Intelligent autocompletion, diagnostics, refactoring (replaces coc.nvim).
+Mark your most-used files and switch between them instantly.
+
+```
+<Space>ha    # Add current file to harpoon
+<Space>hh    # Open harpoon menu
+<Space>1     # Jump to harpoon file 1
+<Space>2     # Jump to harpoon file 2
+<Space>3     # Jump to harpoon file 3
+<Space>4     # Jump to harpoon file 4
+<Space>5     # Jump to harpoon file 5
+```
+
+**Workflow**: Working on a component, its styles, and its tests? Mark all 3 files with `<Space>ha`, then switch with `<Space>1`, `<Space>2`, `<Space>3`. Much faster than Telescope for frequent files.
+
+---
+
+### 3.4 Mason/Native LSP + nvim-cmp - LSP (Language Server Protocol)
+
+Intelligent autocompletion, diagnostics, refactoring.
 
 LSP servers are managed by **Mason** and configured automatically via **mason-lspconfig**.
 
@@ -240,11 +269,11 @@ Auto-formatting on save is enabled (Prettier for JS/TS/CSS/HTML/JSON/YAML/Markdo
 #### Diagnostics (errors/warnings)
 
 ```
-[g            # Previous error
-]g            # Next error
+[g            # Previous diagnostic
+]g            # Next diagnostic
 [G            # Previous error (severe errors only)
 ]G            # Next error (severe errors only)
-<Space>cd     # Diagnostics list
+<Space>cd     # Diagnostics list (location list)
 ```
 
 #### Installed LSP servers (via Mason)
@@ -262,7 +291,23 @@ Auto-formatting on save is enabled (Prettier for JS/TS/CSS/HTML/JSON/YAML/Markdo
 
 ---
 
-### 3.4 Git - Fugitive + gitsigns.nvim
+### 3.5 Trouble - Diagnostics Panel
+
+Better interface for browsing errors, warnings, and TODOs (replaces location list).
+
+```
+<Space>xx    # All diagnostics (entire project)
+<Space>xd    # Diagnostics (current file only)
+<Space>xl    # Location list
+<Space>xq    # Quickfix list
+<Space>xt    # TODO list
+```
+
+Navigate and jump directly to each error. Much more ergonomic than `:lopen`.
+
+---
+
+### 3.6 Git - Fugitive + gitsigns.nvim
 
 #### Fugitive (Git commands)
 
@@ -277,62 +322,19 @@ Auto-formatting on save is enabled (Prettier for JS/TS/CSS/HTML/JSON/YAML/Markdo
 
 In the `:Git` (status) window:
 
-- `s` on a file → Stage
-- `u` on a file → Unstage
-- `cc` → Commit
-- `Enter` on a file → Open the file
-- `o` on a file → Open the file (split)
-- `O` on a file → Open the file (vsplit)
+- `s` on a file: Stage
+- `u` on a file: Unstage
+- `cc`: Commit
+- `ca`: Commit --amend
+- `X`: Checkout (discard changes)
+- `Enter` on a file: Open the file
 
 #### Quick navigation in modified files
 
-**Problem**: You have modified 15 files and want to quickly review them without searching through the file tree.
-
-**Solution 1: Navigation with gitsigns (recommended)**
-
-```
-]c          → Jump to the next change (hunk)
-[c          → Jump to the previous change (hunk)
-```
-
-These shortcuts let you navigate directly between all hunks (change blocks) in the current buffer.
-
-**Solution 2: Telescope with modified files only**
-
-```
-<Space>ff          → Open Telescope
-# Type a few letters of the filename
-# Only modified files appear at the top (thanks to git)
-```
-
-**Solution 3: From the :Git window**
+**Recommended workflow:**
 
 ```bash
-# Open the status
-<Space>gs
-
-# Navigate with j/k to select a file
-# Press Enter to open it
-# Or 'o' to open in a split
-# Or 'O' to open in a vsplit
-
-# Once the file is open:
-<Space>gd     → View the diff of modifications
-]c / [c       → Jump to next/previous change
-```
-
-**Solution 4: List of modified buffers**
-
-```
-<Space>fb      → List all buffers (Telescope)
-# Modified files are marked with +
-# Type to filter
-```
-
-**Recommended workflow for quick review:**
-
-```bash
-1. Or use :Git then navigate:
+1. Open git status:
    <Space>gs
    (Enter on the first file)
    ]c to jump to the next change
@@ -359,36 +361,27 @@ These shortcuts let you navigate directly between all hunks (change blocks) in t
 - `+` : Line added (green)
 - `~` : Line modified (orange)
 - `-` : Line deleted (red)
+- Staged changes appear in muted colors
 
 ---
 
-### 3.5 Minimap (mini.map)
+### 3.7 Minimap (minimap.vim)
 
-Code mini-map (like VS Code), implemented in pure Lua (no Rust dependency).
-
-#### Shortcuts
+Code mini-map displayed as a real split on the right side (uses `code-minimap` in Rust).
 
 | Shortcut     | Action                    |
 | ------------ | ------------------------- |
 | `<Space>mm`  | Toggle (show/hide)        |
 | `<Space>mc`  | Close                     |
 | `<Space>mr`  | Refresh                   |
-| `<Space>mf`  | Toggle focus              |
 
-#### Configuration
-
-- Auto-start: yes (code files only)
-- Position: right
-- Width: 10 columns
-- Git integration: enabled (via gitsigns)
+Auto-start on code files, hidden in special buffers (Neo-tree, Telescope, etc.). Shows git changes and search results.
 
 ---
 
-### 3.6 Snippets (LuaSnip + friendly-snippets)
+### 3.8 Snippets (LuaSnip + friendly-snippets)
 
-Reusable code templates (replaces UltiSnips + vim-snippets).
-
-#### Usage
+Reusable code templates.
 
 1. Type the snippet keyword
 2. Press `Tab` to expand
@@ -408,22 +401,17 @@ import { | } from '';
 function |() {
 
 }
-
-// Type "for" + Tab
-for (let i = 0; i < |; i++) {
-
-}
 ```
 
 Snippets come from **friendly-snippets** (VSCode-compatible collection).
 
 ---
 
-### 3.7 Advanced editing (Comment.nvim + nvim-surround + flash.nvim)
+### 3.9 Advanced editing (ts-comments + nvim-surround + flash.nvim)
 
-#### Comment.nvim - Comment/Uncomment
+#### ts-comments.nvim - Comment/Uncomment
 
-Quickly comment or uncomment lines of code.
+Treesitter-aware commenting. In JSX/TSX, uses `{/* */}` in JSX and `//` in JavaScript automatically.
 
 | Shortcut  | Action              | Description                                        |
 | --------- | ------------------- | -------------------------------------------------- |
@@ -431,60 +419,28 @@ Quickly comment or uncomment lines of code.
 | `gc`      | Comment (visual)    | In visual mode, comments the selection             |
 | `gcap`    | Comment paragraph   | Comments the entire block (paragraph)              |
 
-**Examples:**
-
-```javascript
-// Position yourself on a line
-// Type gcc
-// The line is commented/uncommented
-
-// In visual mode (V to select multiple lines)
-// Type gc
-// All selected lines are commented
-```
-
 #### nvim-surround - Manage surroundings
 
 Add, change or delete character pairs (parentheses, quotes, etc.).
 
 | Shortcut  | Action                    | Example              |
 | --------- | ------------------------- | -------------------- |
-| `cs"'`    | Change surround           | `"text"` → `'text'` |
-| `cs'"`    | Change surround           | `'text'` → `"text"` |
-| `cs"(`    | Change surround           | `"text"` → `(text)` |
-| `cs({`    | Change surround           | `(text)` → `{text}` |
-| `ds"`     | Delete surround           | `"text"` → `text`   |
-| `ds(`     | Delete surround           | `(text)` → `text`   |
-| `ysiw'`   | Add surround to word      | `text` → `'text'`   |
-| `ysiW"`   | Add surround to WORD      | `text` → `"text"`   |
-| `yss'`    | Add surround to line      | `text` → `'text'`   |
+| `cs"'`    | Change surround           | `"text"` > `'text'` |
+| `cs'"`    | Change surround           | `'text'` > `"text"` |
+| `ds"`     | Delete surround           | `"text"` > `text`   |
+| `ds(`     | Delete surround           | `(text)` > `text`   |
+| `ysiw'`   | Add surround to word      | `text` > `'text'`   |
+| `ysiW"`   | Add surround to WORD      | `text` > `"text"`   |
+| `yss'`    | Add surround to line      | `text` > `'text'`   |
+| `S"`      | Surround selection (visual)| Select + `S"`       |
 
-**In visual mode:**
-
-- Select text
-- Type `S"` to surround with `"`
-- Type `S(` to surround with `(`
-
-**Examples:**
-
-```javascript
-// You have: "hello world"
-// Place the cursor anywhere on the line
-// Type cs"'
-// Result: 'hello world'
-
-// You have: text
-// Type ysiw'
-// Result: 'text'
-
-// You have: if (condition) { ... }
-// Type ds(
-// Result: if condition { ... }
-```
+**HTML tags:**
+- `ysiw<div>`: wraps word in `<div>...</div>`
+- `dst`: deletes surrounding HTML tag
 
 #### flash.nvim - Quick navigation
 
-Ultra-fast navigation within the file (replaces vim-easymotion).
+Ultra-fast navigation within the file.
 
 | Shortcut  | Action                    | Description                              |
 | --------- | ------------------------- | ---------------------------------------- |
@@ -497,6 +453,113 @@ Ultra-fast navigation within the file (replaces vim-easymotion).
 2. Type the first letters of the target
 3. Labels appear on matches
 4. Type the label to jump there
+
+---
+
+### 3.10 TODO Comments
+
+Highlights TODO, FIXME, HACK, NOTE, WARNING in your code.
+
+| Shortcut     | Action                   |
+| ------------ | ------------------------ |
+| `]t`         | Next TODO                |
+| `[t`         | Previous TODO            |
+| `<Space>ft`  | Search all TODOs (Telescope) |
+| `<Space>xt`  | TODOs in Trouble panel   |
+
+---
+
+### 3.11 Search & Replace - grug-far
+
+Search and replace across the entire project (like Ctrl+Shift+H in VS Code).
+
+| Shortcut     | Action                              |
+| ------------ | ----------------------------------- |
+| `<Space>sr`  | Open search & replace panel         |
+| `<Space>sw`  | Search & replace word under cursor  |
+
+Features: regex support, file type filter, preview before applying.
+
+---
+
+### 3.12 Debugger (nvim-dap)
+
+Integrated debugger for JavaScript/TypeScript (like VS Code).
+
+| Shortcut     | Action                              |
+| ------------ | ----------------------------------- |
+| `<Space>db`  | Toggle breakpoint                   |
+| `<Space>dB`  | Conditional breakpoint              |
+| `<Space>dc`  | Continue / Launch debug             |
+| `<Space>do`  | Step over                           |
+| `<Space>di`  | Step into                           |
+| `<Space>dO`  | Step out                            |
+| `<Space>dr`  | Restart                             |
+| `<Space>dt`  | Terminate                           |
+| `<Space>du`  | Toggle DAP UI                       |
+
+**Workflow**: Place a breakpoint with `<Space>db`, launch with `<Space>dc`. The UI opens automatically showing variables, call stack, and console.
+
+---
+
+### 3.13 Sessions (persistence.nvim)
+
+Auto-saves your session (open buffers, window layout, cursor positions).
+
+| Shortcut     | Action                              |
+| ------------ | ----------------------------------- |
+| `<Space>ps`  | Restore session for current dir     |
+| `<Space>pS`  | Choose a session to restore         |
+| `<Space>pl`  | Restore last session                |
+| `<Space>pd`  | Don't save session on exit          |
+
+Session is saved automatically when you quit Neovim.
+
+---
+
+### 3.14 Markdown Preview
+
+| Shortcut     | Action                              |
+| ------------ | ----------------------------------- |
+| `<Space>mp`  | Toggle markdown preview in browser  |
+
+Opens a live preview that auto-refreshes as you edit.
+
+---
+
+### 3.15 Which-key - Keymap Help
+
+Press `<Space>` and wait 300ms. A popup shows all available shortcuts.
+
+**Groups:**
+
+| Prefix       | Group                  |
+| ------------ | ---------------------- |
+| `<Space>b`   | Buffers                |
+| `<Space>c`   | Code (LSP)             |
+| `<Space>d`   | Debug (DAP)            |
+| `<Space>f`   | Find (Telescope)       |
+| `<Space>g`   | Git                    |
+| `<Space>h`   | Harpoon                |
+| `<Space>m`   | Minimap / Markdown     |
+| `<Space>o`   | Opencode               |
+| `<Space>p`   | Persistence (sessions) |
+| `<Space>s`   | Search & Replace       |
+| `<Space>t`   | Tailwind               |
+| `<Space>x`   | Trouble (diagnostics)  |
+| `<Space>y`   | Yank path              |
+
+---
+
+### 3.16 Noice - Better UI
+
+Automatically improves Neovim UI:
+- Commands appear in a centered popup
+- Long messages open in a split
+- LSP documentation has borders
+- Notifications are more visible
+
+No shortcuts to learn, everything works automatically.
 
 ---
 
@@ -546,6 +609,7 @@ Ultra-fast navigation within the file (replaces vim-easymotion).
 | `<Space>bp`  | Previous buffer      |
 | `<Space>bd`  | Close buffer         |
 | `<Space>fb`  | Telescope buffers    |
+| `<Space>1-5` | Harpoon files        |
 
 ### Window resizing
 
@@ -555,13 +619,10 @@ Ultra-fast navigation within the file (replaces vim-easymotion).
 | `:res -5`             | Height -5 lines              |
 | `:vert res +10`       | Width +10 columns            |
 | `:vert res -10`       | Width -10 columns            |
-| `:resize 20`          | Fixed height to 20           |
-| `:vertical resize 80` | Fixed width to 80            |
 | `Ctrl+w =`            | Equalize all windows         |
 | `Ctrl+w _`            | Maximize height              |
-| `Ctrl+w \|`           | Maximize width               |
 
-### Neovim ↔ Zellij navigation
+### Neovim / Zellij navigation
 
 The same shortcuts work in Neovim and Zellij (via vim-tmux-navigator):
 
@@ -601,7 +662,6 @@ The same shortcuts work in Neovim and Zellij (via vim-tmux-navigator):
 | --------- | -------------------------- |
 | `u`       | Undo                       |
 | `U`       | Redo                       |
-| `Ctrl+r`  | Redo                       |
 | `.`       | Repeat last action         |
 
 ### Indentation
@@ -618,91 +678,60 @@ The same shortcuts work in Neovim and Zellij (via vim-tmux-navigator):
 | Shortcut  | Action                   | Example                                          |
 | --------- | ------------------------ | ------------------------------------------------ |
 | `r`       | Replace one character    | `rx` replaces the character under cursor with x  |
-| `R`       | Replace mode             | Replaces all characters until Esc                |
 | `cw`      | Change word              | Changes from cursor to end of word               |
 | `ciw`     | Change inner word        | Changes the entire word under cursor             |
 | `caw`     | Change around word       | Changes the word + space                         |
 | `ci"`     | Change inner `""`        | Changes content between quotes                   |
 | `ci(`     | Change inner `()`        | Changes content between parentheses              |
 | `ci{`     | Change inner `{}`        | Changes content between braces                   |
-| `ci[`     | Change inner `[]`        | Changes content between brackets                 |
-| `ci<`     | Change inner `<>`        | Changes content between angle brackets           |
 | `cit`     | Change inner tag         | Changes content between HTML/XML tags            |
 
 **Practical examples:**
 
 ```javascript
 // You have: const name = "John";
-// Place the cursor on "John"
-// Type ci"
+// Place the cursor on "John", type ci"
 // Type Bob
 // Result: const name = "Bob";
 
-// You have: function test()
-// Place the cursor on "test"
-// Type ciw
-// Type newName
-// Result: function newName()
-
 // You have: console.log(message)
-// Type ci(
-// Type "Hello"
+// Type ci(, type "Hello"
 // Result: console.log("Hello")
 ```
 
-### Search and replace (substitution)
+### Search and replace
 
-Replace text in the entire file or a selection.
-
-| Command                 | Action                                  | Description                                            |
-| ----------------------- | --------------------------------------- | ------------------------------------------------------ |
-| `:%s/old/new/`          | Replace first occurrence per line       | On each line, replaces the first occurrence             |
-| `:%s/old/new/g`         | Replace all occurrences                 | Replaces ALL occurrences in the file                    |
-| `:%s/old/new/gc`        | Replace with confirmation               | Asks for confirmation for each replacement              |
-| `:s/old/new/`           | Replace on current line                 | Only the first occurrence on the current line           |
-| `:s/old/new/g`          | Replace all on line                     | All occurrences on the current line                     |
+| Command                 | Action                                  |
+| ----------------------- | --------------------------------------- |
+| `:%s/old/new/g`         | Replace all occurrences in file         |
+| `:%s/old/new/gc`        | Replace with confirmation               |
+| `:s/old/new/g`          | Replace all on current line             |
 
 **Leader shortcuts:**
 
 ```
-<Space>r     → Opens :%s//g (ready to type old and new)
-<Space>R     → Replaces the word under cursor (:s/<word>//g)
+<Space>r     > Opens :%s//g (ready to type)
+<Space>R     > Replaces the word under cursor
+<Space>sr    > Search & Replace project-wide (grug-far)
+<Space>sw    > Search & Replace word under cursor (grug-far)
 ```
-
-**Practical examples:**
-
-```javascript
-// Replace "var" with "const" in the entire file
-:%s/var/const/g
-
-// Replace all occurrences of "foo" with "bar" with confirmation
-:%s/foo/bar/gc
-
-// Replace on the current line only
-:s/old/new/g
-
-// Use regular expressions
-:%s/\d\+/NUMBER/g    // Replaces all numbers with "NUMBER"
-
-// Replace with the word under cursor
-// Place the cursor on "getUser"
-// Type <Space>R
-// Type "fetchUser"
-// Result: replaces all occurrences of "getUser" with "fetchUser"
-```
-
-**Tips:**
-
-- Use `&` to repeat the last substitution on another line
-- Use `:%s//~/g` to reuse the previous pattern
-- Add `i` at the end to ignore case: `:%s/foo/bar/gi`
 
 ### Other edits
 
 | Shortcut  | Action         |
 | --------- | -------------- |
 | `~`       | Toggle case    |
-| `J`       | Join lines     |
+
+### vim-unimpaired shortcuts
+
+| Shortcut    | Action                          |
+| ----------- | ------------------------------- |
+| `]q` / `[q` | Next/previous quickfix         |
+| `]l` / `[l` | Next/previous location list    |
+| `]b` / `[b` | Next/previous buffer           |
+| `]e` / `[e` | Move line down/up              |
+| `]<Space>`  | Add empty line below           |
+| `[<Space>`  | Add empty line above           |
 
 ---
 
@@ -720,7 +749,6 @@ Replace text in the entire file or a selection.
 | `:q`          | Quit                        |
 | `:wq` or `ZZ` | Save and quit              |
 | `:q!`         | Quit without saving         |
-| `:wqa`        | Save all and quit           |
 
 ### Search
 
@@ -728,29 +756,29 @@ Replace text in the entire file or a selection.
 | -------- | --------------------------------------- |
 | `/word`  | Search forward                          |
 | `?word`  | Search backward                         |
-| `n`      | Next result                             |
-| `N`      | Previous result                         |
-| `*`      | Search word under cursor (forward)      |
-| `#`      | Search word under cursor (backward)     |
-| `:noh`   | Disable highlight                       |
-
-### File operations
-
-| Command       | Action                 |
-| ------------- | ---------------------- |
-| `:e file`     | Edit a file            |
-| `:saveas name`| Save as                |
+| `n`      | Next result (centered)                  |
+| `N`      | Previous result (centered)              |
+| `*`      | Search word under cursor (centered)     |
+| `#`      | Search word backward (centered)         |
+| `<Space><Space>` | Clear search highlight           |
 
 ### Copy file path
 
-| Shortcut        | Action                           | Example                            |
-| --------------- | -------------------------------- | ---------------------------------- |
-| `<Space>yp`     | Copy absolute path               | `/home/user/project/app/file.ts`   |
-| `<Space>yr`     | Copy relative path               | `app/file.ts`                      |
-| `<Space>yf`     | Copy filename                    | `file.ts`                          |
-| `:CopyPath`     | Copy absolute path (command)     |                                    |
-| `:CopyRelPath`  | Copy relative path (command)     |                                    |
-| `:CopyFileName` | Copy filename (command)          |                                    |
+| Shortcut        | Action                           |
+| --------------- | -------------------------------- |
+| `<Space>yp`     | Copy absolute path               |
+| `<Space>yr`     | Copy relative path               |
+| `<Space>yf`     | Copy filename                    |
+
+### Custom commands
+
+| Command           | Action                              |
+| ----------------- | ----------------------------------- |
+| `:FormatJSON`     | Pretty-print JSON                   |
+| `:ClearMarks`     | Delete all marks                    |
+| `:Count {pat}`    | Count occurrences                   |
+| `:TailwindWrapAll`| Wrap Tailwind classes in all files  |
+| `:Lazy`           | Plugin manager (or `<Space>L`)      |
 
 ---
 
@@ -758,22 +786,10 @@ Replace text in the entire file or a selection.
 
 ### Plugins not working
 
-#### Reinstall / sync plugins
-
 ```
-:Lazy sync
-```
-
-#### Update plugins
-
-```
-:Lazy update
-```
-
-#### View plugin status
-
-```
-:Lazy
+:Lazy sync        # Sync plugins
+:Lazy update      # Update plugins
+:Lazy             # View status (or <Space>L)
 ```
 
 ### LSP not working
@@ -795,7 +811,6 @@ node --version
 ### Font issues (incorrect icons)
 
 Install a Nerd Font:
-
 - [FiraCode Nerd Font](https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.2/FiraCode.zip)
 - [Hack Nerd Font](https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.2/Hack.zip)
 
@@ -804,28 +819,22 @@ Configure the font in Kitty (`~/.config/kitty/kitty.conf`).
 ### Common errors
 
 **"I can't type!"**
-→ You are in NORMAL mode. Press `i` to switch to INSERT mode
+> You are in NORMAL mode. Press `i` to switch to INSERT mode
 
 **"I can't quit Neovim!"**
-→ Type `:q!` (quit without saving) or `:wq` (save and quit)
+> Type `:q!` (quit without saving) or `:wq` (save and quit)
 
 **"Telescope won't open!"**
-→ Make sure you are in NORMAL mode (press Esc)
-→ Check `<Space>ff` (space then f then f)
+> Make sure you are in NORMAL mode (press Esc)
 
-**"I'm stuck in NvimTree!"**
-→ `q` to close NvimTree
-→ Or `Ctrl+w` then `l` to go right
+**"I'm stuck in Neo-tree!"**
+> `q` to close Neo-tree, or `Ctrl+w` then `l` to go right
 
 **"Formatting doesn't work!"**
-→ Check that Prettier is installed: `npm list -g prettier`
-→ Or install it: `npm install -g prettier`
+> Check that Prettier is installed: `npm list -g prettier`
 
-**"I'm looking for a command!"**
-→ `:help windows` → Help on windows
-→ `:help window-resize` → Resizing
-→ `:help split` → Split command
-→ `<Space>fc` → Search commands (Telescope)
+**"I forgot a shortcut!"**
+> Press `<Space>` and wait — which-key will show you everything
 
 ---
 
@@ -833,36 +842,53 @@ Configure the font in Kitty (`~/.config/kitty/kitty.conf`).
 
 ### Shortcuts by plugin
 
-| Plugin         | Shortcut     | Action                            |
-| -------------- | ------------ | --------------------------------- |
-| **Telescope**  | `<Space>ff`  | Files                             |
-| **Telescope**  | `<Space>fg`  | Grep                              |
-| **Telescope**  | `<Space>fb`  | Buffers                           |
-| **Telescope**  | `<Space>fh`  | History                           |
-| **Telescope**  | `<Space>fc`  | Commands                          |
-| **Telescope**  | `<Space>fm`  | Keymaps                           |
-| **NvimTree**   | `<Space>e`   | Toggle                            |
-| **NvimTree**   | `<Space>E`   | Locate file                       |
-| **NvimTree**   | `<Space>ep`  | Back to project root              |
-| **LSP**        | `gd`         | Definition                        |
-| **LSP**        | `gr`         | References                        |
-| **LSP**        | `<Space>rn`  | Rename                            |
-| **LSP**        | `<Space>d`   | Doc                               |
-| **LSP**        | `<Space>ca`  | Code action                       |
-| **conform**    | `<Space>f`   | Format                            |
-| **Git**        | `<Space>gs`  | Status                            |
-| **Git**        | `<Space>gd`  | Diff                              |
-| **gitsigns**   | `]c` / `[c`  | Changes                           |
-| **gitsigns**   | `<Space>hs`  | Stage hunk                        |
-| **gitsigns**   | `<Space>hp`  | Preview hunk                      |
-| **mini.map**   | `<Space>mm`  | Toggle minimap                    |
-| **Comment**    | `gcc`        | Comment line                      |
-| **Comment**    | `gc`         | Comment (visual)                  |
-| **Surround**   | `cs"'`       | Change " to '                     |
-| **Surround**   | `ds"`        | Delete ""                         |
-| **Surround**   | `ysiw'`      | Add '' to word                    |
-| **flash**      | `s`          | Quick jump                        |
-| **flash**      | `S`          | Treesitter selection              |
+| Plugin           | Shortcut     | Action                            |
+| ---------------- | ------------ | --------------------------------- |
+| **Telescope**    | `<Space>ff`  | Files                             |
+| **Telescope**    | `<Space>fg`  | Grep                              |
+| **Telescope**    | `<Space>fb`  | Buffers                           |
+| **Telescope**    | `<Space>fh`  | History                           |
+| **Telescope**    | `<Space>fc`  | Commands                          |
+| **Telescope**    | `<Space>fm`  | Keymaps                           |
+| **Telescope**    | `<Space>ft`  | TODOs                             |
+| **Neo-tree**     | `<Space>e`   | Toggle                            |
+| **Neo-tree**     | `<Space>E`   | Locate file                       |
+| **Neo-tree**     | `<Space>ep`  | Back to project root              |
+| **Harpoon**      | `<Space>ha`  | Add file                          |
+| **Harpoon**      | `<Space>hh`  | Menu                              |
+| **Harpoon**      | `<Space>1-5` | Jump to file 1-5                  |
+| **LSP**          | `gd`         | Definition                        |
+| **LSP**          | `gr`         | References                        |
+| **LSP**          | `<Space>rn`  | Rename                            |
+| **LSP**          | `<Space>d`   | Doc                               |
+| **LSP**          | `<Space>ca`  | Code action                       |
+| **conform**      | `<Space>f`   | Format                            |
+| **Trouble**      | `<Space>xx`  | Diagnostics (project)             |
+| **Trouble**      | `<Space>xd`  | Diagnostics (file)                |
+| **Trouble**      | `<Space>xt`  | TODOs                             |
+| **Git**          | `<Space>gs`  | Status                            |
+| **Git**          | `<Space>gd`  | Diff                              |
+| **gitsigns**     | `]c` / `[c`  | Changes                           |
+| **gitsigns**     | `<Space>hs`  | Stage hunk                        |
+| **gitsigns**     | `<Space>hp`  | Preview hunk                      |
+| **mini.map**     | `<Space>mm`  | Toggle minimap                    |
+| **grug-far**     | `<Space>sr`  | Search & Replace                  |
+| **grug-far**     | `<Space>sw`  | Search word under cursor          |
+| **DAP**          | `<Space>db`  | Breakpoint                        |
+| **DAP**          | `<Space>dc`  | Continue/launch                   |
+| **DAP**          | `<Space>du`  | Toggle UI                         |
+| **persistence**  | `<Space>ps`  | Restore session                   |
+| **TODO**         | `]t` / `[t`  | Next/Previous TODO                |
+| **ts-comments**  | `gcc`        | Comment line                      |
+| **ts-comments**  | `gc`         | Comment (visual)                  |
+| **Surround**     | `cs"'`       | Change " to '                     |
+| **Surround**     | `ds"`        | Delete ""                         |
+| **Surround**     | `ysiw'`      | Add '' to word                    |
+| **flash**        | `s`          | Quick jump                        |
+| **flash**        | `S`          | Treesitter selection              |
+| **markdown**     | `<Space>mp`  | Preview                           |
+| **which-key**    | `<Space>`    | Show all shortcuts (wait 300ms)   |
+| **Lazy**         | `<Space>L`   | Plugin manager                    |
 
 ### General shortcuts
 
@@ -870,68 +896,92 @@ Configure the font in Kitty (`~/.config/kitty/kitty.conf`).
 LEADER = Space
 
 FILES:
-  <Space>ff    → Open file (Telescope)
-  <Space>fg    → Search text
-  <Space>fb    → Buffers
-  <Space>e     → NvimTree
-  <Space>ep    → NvimTree: back to project root
-  <Space>w     → Save
-  <Space>x     → Save and quit
+  <Space>ff    > Find file (Telescope)
+  <Space>fg    > Search text (grep)
+  <Space>fb    > Buffers
+  <Space>ft    > TODOs
+  <Space>e     > Neo-tree
+  <Space>ep    > Neo-tree: project root
+  <Space>ha    > Harpoon: add file
+  <Space>1-5   > Harpoon: jump to file
+  <Space>w     > Save
+  <Space>x     > Save and quit
 
 NAVIGATION:
-  h/j/k/l       → Move
-  gg/G          → Beginning/End of file
-  0/$           → Beginning/End of line
-  w/b           → Next/Previous word
-  s             → Flash (quick jump)
-  <Space>v      → Vertical split
-  <Space>s      → Horizontal split
-  <Space>h/j/k/l → Switch window
-  <Space>bn/bp  → Next/Previous buffer
+  h/j/k/l       > Move
+  H/L           > Line start/end
+  J/K           > 5 lines down/up
+  gg/G          > Beginning/End of file
+  w/b           > Next/Previous word
+  s             > Flash (quick jump)
+  <Space>v      > Vertical split
+  <Space>s      > Horizontal split
+  <Space>h/j/k/l > Switch window
+  <Space>bn/bp  > Next/Previous buffer
 
 EDITING:
-  i/a/o         → Insert mode
-  jj/jk         → Exit insert
-  dd/yy/p       → Cut/Copy/Paste
-  u/U           → Undo/Redo
-  >>/<<         → Indent
-  cw/ciw        → Change word
-  ci"           → Change inside quotes
-  gcc           → Comment line
-  gc            → Comment (visual)
-  cs"'          → Change quotes
-  ds"           → Delete quotes
-  ysiw'         → Add quotes to word
+  i/a/o         > Insert mode
+  jj/jk         > Exit insert
+  dd/yy/p       > Cut/Copy/Paste
+  u/U           > Undo/Redo
+  >>/<<         > Indent
+  cw/ciw        > Change word
+  ci"           > Change inside quotes
+  gcc           > Comment line
+  gc            > Comment (visual)
+  cs"'          > Change quotes
+  ds"           > Delete quotes
+  ysiw'         > Add quotes to word
 
 SEARCH/REPLACE:
-  /word         → Search
-  n/N           → Next/Previous
-  *             → Search word under cursor
-  <Space>r      → Replace (:%s//g)
-  <Space>R      → Replace word under cursor
-  :%s/a/b/g     → Replace all in file
-  :%s/a/b/gc    → Replace with confirmation
+  /word         > Search
+  n/N           > Next/Previous (centered)
+  *             > Search word under cursor
+  <Space>r      > Replace in file
+  <Space>R      > Replace word under cursor
+  <Space>sr     > Search & Replace (project)
 
 LSP:
-  gd            → Definition
-  gr            → References
-  <Space>rn     → Rename
-  <Space>d      → Documentation
-  [g/]g         → Errors
-  <Space>ca     → Code action
-  <Space>f      → Format
+  gd            > Definition
+  gr            > References
+  <Space>rn     > Rename
+  <Space>d      > Documentation
+  [g/]g         > Diagnostics
+  <Space>ca     > Code action
+  <Space>f      > Format
 
 GIT:
-  <Space>gs     → Git status
-  <Space>gd     → Diff
-  ]c/[c         → Next/Previous change
-  <Space>hs     → Stage change
-  <Space>hu     → Undo stage
+  <Space>gs     > Git status
+  <Space>gd     > Diff
+  ]c/[c         > Next/Previous change
+  <Space>hs     > Stage hunk
+
+DIAGNOSTICS:
+  <Space>xx     > All diagnostics
+  <Space>xd     > File diagnostics
+  ]t/[t         > Next/Previous TODO
+
+DEBUG:
+  <Space>db     > Breakpoint
+  <Space>dc     > Continue/Launch
+  <Space>do     > Step over
+  <Space>di     > Step into
+  <Space>du     > Toggle UI
+
+SESSION:
+  <Space>ps     > Restore session
+  <Space>pl     > Last session
+
+MISC:
+  <Space>mp     > Markdown preview
+  <Space>tw     > Tailwind wrap
+  <Space>L      > Lazy (plugins)
+  <Space>       > Which-key (wait for help)
 ```
 
 ---
 
-**Last updated:** March 3, 2026
-**Version:** 4.0
+**Last updated:** April 2, 2026
+**Version:** 5.0
 
 For complete Zellij shortcuts: `cat ~/.config/zellij/SHORTCUTS.md`

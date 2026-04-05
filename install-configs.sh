@@ -223,12 +223,15 @@ install_configs() {
     echo ""
     
     install_file "$SCRIPT_DIR/configs/bash/bashrc" "$HOME/.bashrc" "Bash RC"
-    install_file "$SCRIPT_DIR/configs/nvim" "$HOME/.config/nvim" "Neovim config"
+    install_file "$SCRIPT_DIR/configs/nvim" "$HOME/.config/nvim" "Neovim config (legacy)"
+    install_file "$SCRIPT_DIR/configs/nvim-lazyvim" "$HOME/.config/nvim-lazyvim" "LazyVim config (primary)"
     install_file "$SCRIPT_DIR/configs/kitty/kitty.conf" "$HOME/.config/kitty/kitty.conf" "Kitty terminal"
     install_file "$SCRIPT_DIR/configs/zellij/config.kdl" "$HOME/.config/zellij/config.kdl" "Zellij config"
     install_file "$SCRIPT_DIR/configs/zellij/layouts" "$HOME/.config/zellij/layouts" "Zellij layouts"
+    install_file "$SCRIPT_DIR/configs/zellij/themes" "$HOME/.config/zellij/themes" "Zellij themes"
     install_file "$SCRIPT_DIR/configs/fzf/fzf.bash" "$HOME/.fzf.bash" "FZF bash"
     install_file "$SCRIPT_DIR/configs/opencode" "$HOME/.config/opencode" "Opencode config"
+    install_file "$SCRIPT_DIR/configs/starship/starship.toml" "$HOME/.config/starship.toml" "Starship prompt"
 
     echo ""
 
@@ -236,7 +239,7 @@ install_configs() {
         log_info "Backup created in: $BACKUP_DIR"
     fi
 
-    log_info "Note: lazy.nvim auto-bootstraps on first nvim launch"
+    log_info "Note: lazy.nvim auto-bootstraps on first launch (nvim or lvim)"
 }
 
 main() {
@@ -267,7 +270,8 @@ main() {
     echo "========================================"
     echo ""
     echo "Next step:"
-    echo "  nvim  # lazy.nvim will install plugins automatically"
+    echo "  lvim  # LazyVim (primary config)"
+    echo "  nvim  # Legacy config"
     echo ""
 }
 

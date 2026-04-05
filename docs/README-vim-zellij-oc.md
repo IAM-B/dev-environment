@@ -1,4 +1,4 @@
-# Technical Documentation - Neovim IDE + Zellij + Opencode
+# Technical Documentation - LazyVim + Zellij + Opencode
 
 Architecture and technical configuration documentation for the development environment.
 
@@ -7,22 +7,26 @@ Architecture and technical configuration documentation for the development envir
 ## Overview
 
 Complete configuration for a JavaScript/TypeScript development environment:
-- **Neovim 0.11+**: IDE editor (native LSP, autocompletion, linting, formatting)
+- **LazyVim** (`lvim`): Primary Neovim IDE (distribution preconfigured, 24 extras)
+- **Neovim** (`nvim`): Legacy custom config (47 plugins, kept for reference)
 - **Zellij**: Terminal multiplexer with layouts
 - **Opencode**: Integrated AI assistant
-- **Kitty**: Terminal with Nerd Fonts and image support
+- **Kitty**: GPU-accelerated terminal with Nerd Fonts and image support
 
-### "code" Layout
+### "code" Layout (`zc`)
+
+Sessions are named `code-DIRNAME-HHMM` (e.g. `code-myproject-1430`).
 
 ```
-┌─────────────────────┬──────────┐
-│                     │ Terminal │
-│     NEOVIM          │ (tests)  │
-│    (65%)            ├──────────┤
-│                     │ Opencode │
-│                     │  (35%)   │
-└─────────────────────┴──────────┘
++---------------------+----------+
+|                     |          |
+|     LAZYVIM         |  CLAUDE  |
+|      (65%)          |  CODE    |
+|                     |  (35%)   |
++---------------------+----------+
 ```
+
+LazyVim se lance automatiquement dans le pane principal.
 
 ---
 
@@ -33,24 +37,35 @@ Complete configuration for a JavaScript/TypeScript development environment:
 | Source (repo) | Destination | Description |
 |--------------|-------------|-------------|
 | `configs/bash/bashrc` | `~/.bashrc` | Bash configuration |
-| `configs/nvim/` | `~/.config/nvim/` | Neovim configuration (init.lua + lua/) |
+| `configs/nvim-lazyvim/` | `~/.config/nvim-lazyvim/` | **LazyVim config (primary)** |
+| `configs/nvim/` | `~/.config/nvim/` | Legacy Neovim config |
 | `configs/kitty/kitty.conf` | `~/.config/kitty/kitty.conf` | Kitty configuration |
 | `configs/zellij/config.kdl` | `~/.config/zellij/config.kdl` | Zellij configuration |
-| `configs/zellij/layouts/code.kdl` | `~/.config/zellij/layouts/code.kdl` | Code layout |
+| `configs/zellij/layouts/code.kdl` | `~/.config/zellij/layouts/code.kdl` | Code layout (launches LazyVim + Claude Code) |
 | `configs/zellij/layouts/dev.kdl` | `~/.config/zellij/layouts/dev.kdl` | Dev layout |
+| `configs/zellij/layouts/agents.kdl` | `~/.config/zellij/layouts/agents.kdl` | Agents layout (4x Claude) |
+| `configs/starship/starship.toml` | `~/.config/starship.toml` | Starship prompt |
 | `configs/fzf/fzf.bash` | `~/.fzf.bash` | fzf configuration |
 | `configs/opencode/package.json` | `~/.opencode/package.json` | Opencode configuration |
 
 ### Created Directories
 
 ```
-~/.config/nvim/
+~/.config/nvim-lazyvim/           # PRIMARY CONFIG (LazyVim)
+├── init.lua                      # Entry point
+├── lazyvim.json                  # Enabled extras (24)
+├── stylua.toml                   # Lua formatter
+├── lua/config/                   # Options, keymaps, autocmds, lazy.lua
+└── lua/plugins/                  # Custom plugins (lang, minimap)
+
+~/.config/nvim/                   # LEGACY CONFIG (custom)
 ├── init.lua              # Entry point (leader key, lazy.nvim)
 ├── lua/
 │   ├── core/             # Options, keymaps, autocmds
-│   └── plugins/          # Configuration for each plugin
+│   └── plugins/          # Configuration for each plugin (17 files)
 ├── syntax/
 │   └── edge.vim          # Edge syntax (AdonisJS)
+├── queries/              # Treesitter query overrides
 └── lazy-lock.json        # Plugin version lock
 
 ~/.local/state/nvim/
@@ -80,22 +95,32 @@ Complete configuration for a JavaScript/TypeScript development environment:
 
 ### Main Components
 
-#### 1. Neovim (Editor)
-- **Plugin manager**: lazy.nvim
-- **LSP**: mason.nvim + mason-lspconfig + nvim-lspconfig (native)
-- **Completion**: nvim-cmp (LSP, snippets, buffer, path)
-- **Formatting**: conform.nvim (Prettier)
-- **Navigation**: Telescope, NvimTree
-- **Git**: fugitive, gitsigns.nvim
-- **Appearance**: Dracula (dracula.nvim), lualine.nvim
-- **Snippets**: LuaSnip + friendly-snippets
-- **Editing**: nvim-surround, Comment.nvim, nvim-autopairs, flash.nvim
-- **Minimap**: mini.map (pure Lua)
+#### 1. LazyVim (Primary Editor) — 24 extras
+
+- **Distribution**: LazyVim (by folke) — pre-configured Neovim IDE
+- **Launch**: `lvim` or via Zellij `zc`
+- **Completion**: blink.cmp (modern, fast)
+- **Navigation**: snacks.picker / Telescope, Neo-tree, Harpoon2
+- **Git**: gitsigns.nvim + lazygit (full TUI)
+- **Appearance**: TokyoNight, lualine.nvim, bufferline.nvim
+- **Editing**: mini.surround, ts-comments.nvim, flash.nvim
+- **Debugging**: nvim-dap (via extras)
+- **Diagnostics**: trouble.nvim, todo-comments.nvim
+- **UI**: noice.nvim, which-key.nvim
+- **Languages**: TypeScript, Svelte, Python, Tailwind, Docker, YAML, JSON, Markdown
+- **Custom plugins**: minimap.vim, Svelte lang support
+
+#### Legacy: Neovim custom config — 47 plugins
+
+Available via `nvim`. See `configs/nvim/` and [nvim-guide-config-actuelle.md](nvim-guide-config-actuelle.md).
+- **Sessions**: persistence.nvim
+- **Minimap**: minimap.vim (code-minimap, real split)
+- **Markdown**: markdown-preview.nvim, image.nvim
 
 #### 2. Zellij (Multiplexer)
 - **Configuration**: `config.kdl`
-- **Layouts**: `code.kdl`, `dev.kdl`
-- **Theme**: Dracula
+- **Layouts**: `code.kdl`, `dev.kdl`, `agents.kdl`
+- **Theme**: TokyoNight
 - **Shell**: Bash
 
 #### 3. Bash (Shell)
@@ -116,9 +141,12 @@ For daily usage, see the specialized guides:
 
 | Guide | Content |
 |-------|---------|
-| [VIM-GUIDE.md](VIM-GUIDE.md) | **Everything about Neovim**: modes, plugins (Telescope, NvimTree, LSP, Git, snippets), navigation, troubleshooting |
+| [lazyvim-guide.md](lazyvim-guide.md) | **Guide LazyVim** : config principale, raccourcis, lazygit, extras (FR) |
+| [nvim-guide-config-actuelle.md](nvim-guide-config-actuelle.md) | Guide config Neovim legacy : raccourcis, plugins, workflows (FR) |
+| [nvim-ameliorations-futures.md](nvim-ameliorations-futures.md) | Roadmap des ameliorations futures — archive (FR) |
+| [VIM-GUIDE.md](VIM-GUIDE.md) | Vim general : modes, navigation, troubleshooting |
 | [BASH-SHORTCUTS.md](BASH-SHORTCUTS.md) | Bash keyboard shortcuts and command line |
-| [INSTALLED-PLUGINS.md](INSTALLED-PLUGINS.md) | Complete list of plugins, aliases, and functions |
+| [INSTALLED-PLUGINS.md](INSTALLED-PLUGINS.md) | Liste des 47 plugins legacy |
 | [README.md](../README.md) | Overview and quick installation |
 
 ---
@@ -133,16 +161,19 @@ Edit `~/.config/zellij/layouts/code.kdl`:
 layout {
     tab name="code" {
         pane split_direction="vertical" {
-            pane size="70%" { focus true }
-            pane size="30%" { command "opencode" }
+            pane size="65%" {
+                focus true
+                command "lvim"
+            }
+            pane size="35%" { command "claude" args="--resume" }
         }
     }
 }
 ```
 
-### Add Neovim plugins
+### Add LazyVim plugins
 
-1. Create or edit a file in `~/.config/nvim/lua/plugins/`
+1. Create a file in `~/.config/nvim-lazyvim/lua/plugins/` (e.g. `myplugin.lua`)
 2. Add the lazy.nvim spec:
    ```lua
    return {
@@ -152,7 +183,8 @@ layout {
      end,
    }
    ```
-3. In Neovim: `:Lazy sync`
+3. In LazyVim: `:Lazy sync` (or `<Space>L` then `S`)
+4. For extras: `:LazyExtras` to browse and enable/disable
 
 ### Add Bash aliases
 
@@ -202,8 +234,6 @@ node --version
 
 # Restart the LSP server
 :LspRestart
-
-# See VIM-GUIDE.md for detailed troubleshooting
 ```
 
 ### Plugins not loading
@@ -213,7 +243,7 @@ node --version
 :Lazy sync
 
 # View plugin status
-:Lazy
+:Lazy    (or <Space>L)
 
 # Update plugins
 :Lazy update
@@ -226,9 +256,14 @@ node --version
 - [lazy.nvim](https://github.com/folke/lazy.nvim)
 - [mason.nvim](https://github.com/williamboman/mason.nvim)
 - [Telescope](https://github.com/nvim-telescope/telescope.nvim)
+- [Neo-tree](https://github.com/nvim-neo-tree/neo-tree.nvim)
+- [Harpoon](https://github.com/ThePrimeagen/harpoon)
+- [trouble.nvim](https://github.com/folke/trouble.nvim)
+- [nvim-dap](https://github.com/mfussenegger/nvim-dap)
 - [Zellij](https://zellij.dev/)
-- [Dracula Theme](https://draculatheme.com/)
+- [TokyoNight](https://github.com/folke/tokyonight.nvim)
+- [LazyVim](https://lazyvim.org/)
 
 ---
 
-**Last updated:** March 3, 2026
+**Last updated:** April 5, 2026

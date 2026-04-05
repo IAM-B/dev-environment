@@ -328,11 +328,11 @@ verify_install() {
     echo "  fd:      $(command -v fdfind >/dev/null && fdfind --version | cut -d' ' -f2 || fd --version | head -1)"
     echo "  ctags:   $(ctags --version | head -1)"
 
-    # Optional: Kitty (not required for SSH/headless setups)
+    # Kitty (optional for SSH/headless setups)
     if command -v kitty >/dev/null 2>&1; then
         echo "  kitty:   $(kitty --version 2>/dev/null)"
     else
-        echo "  kitty:   not installed (optional — install with --with-kitty)"
+        echo "  kitty:   not installed"
     fi
     
     return 0
@@ -344,8 +344,7 @@ print_help() {
     echo "Options:"
     echo "  --skip-system    Skip system dependency installation"
     echo "  --skip-node      Skip Node.js/Yarn installation"
-    echo "  --skip-apps      Skip Zellij/Opencode installation"
-    echo "  --with-kitty     Also install Kitty terminal (GPU-accelerated)"
+    echo "  --skip-apps      Skip Zellij/Opencode/Kitty installation"
     echo "  --verify         Only verify the installation"
     echo "  --help           Display this help message"
     echo ""
@@ -355,15 +354,13 @@ main() {
     local skip_system=false
     local skip_node=false
     local skip_apps=false
-    local with_kitty=false
     local verify_only=false
-    
+
     for arg in "$@"; do
         case "$arg" in
             --skip-system) skip_system=true ;;
             --skip-node) skip_node=true ;;
             --skip-apps) skip_apps=true ;;
-            --with-kitty) with_kitty=true ;;
             --verify) verify_only=true ;;
             --help) print_help; exit 0 ;;
         esac
@@ -394,16 +391,27 @@ main() {
         log_info "Node.js/Yarn skipped"
     fi
     
-    if [ "$with_kitty" = true ]; then
-        install_kitty
-    fi
-
     if [ "$skip_apps" = false ]; then
         install_neovim
         install_zellij
         install_opencode
+
+        # Kitty - prompt interactif (skip en mode non-interactif)
+        if [ -t 0 ]; then
+            if command -v kitty >/dev/null 2>&1; then
+                log_info "Kitty already installed: $(kitty --version)"
+            else
+                echo ""
+                read -p "Installer Kitty terminal (GPU-accelerated) ? [o/N] " response
+                if [[ "$response" =~ ^[oOyY]$ ]]; then
+                    install_kitty
+                else
+                    log_info "Kitty skipped"
+                fi
+            fi
+        fi
     else
-        log_info "Zellij/Opencode skipped"
+        log_info "Zellij/Opencode/Kitty skipped"
     fi
     
     verify_install

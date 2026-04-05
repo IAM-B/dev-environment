@@ -2,10 +2,9 @@
 # ============================================
 # CONFIGURATION SYNCHRONIZATION
 # ============================================
-# Two-way sync between ~/ and the repo:
-#   1. Applies repo changes to ~/ (install-configs.sh)
-#   2. Copies ~/ configs back to the repo
-#   3. Commits and pushes if changes detected
+# One-way sync: ~/ configs → repo (backup/versioning)
+# Home configs are the source of truth.
+# Use install-configs.sh separately to restore repo → ~/
 #
 # Usage:
 #   ./sync-configs.sh           # Sync + commit + push
@@ -87,6 +86,36 @@ sync_nvim() {
     log_info "Synced: $source (exclusions: lazy-lock.json, .luarc.json, plugin/, lazy/)"
 }
 
+# Sync LazyVim config with exclusions
+sync_nvim_lazyvim() {
+    local source="$HOME/.config/nvim-lazyvim"
+    local target="$REPO_DIR/configs/nvim-lazyvim"
+
+    if [ ! -d "$source" ]; then
+        log_warn "Source not found: $source (skipping)"
+        return 0
+    fi
+
+    if [ "$DRY_RUN" = true ]; then
+        log_info "[DRY-RUN] $source → $target (rsync with exclusions)"
+        return 0
+    fi
+
+    rsync -av --delete \
+        --exclude='lazy-lock.json' \
+        --exclude='.luarc.json' \
+        --exclude='.neoconf.json' \
+        --exclude='plugin/' \
+        --exclude='lazy/' \
+        --exclude='LICENSE' \
+        --exclude='README.md' \
+        --exclude='.git/' \
+        --exclude='.gitignore' \
+        "$source/" "$target/" > /dev/null
+
+    log_info "Synced: $source (exclusions: lazy-lock.json, .luarc.json, .neoconf.json, plugin/, lazy/)"
+}
+
 # Sync Opencode config with exclusions (node_modules, bun.lock)
 sync_opencode() {
     local source="$HOME/.config/opencode"
@@ -117,25 +146,18 @@ echo "  CONFIG SYNCHRONIZATION"
 echo "========================================"
 echo ""
 
-# Step 1: Apply repo changes to local machine
-# (catches edits made directly in the repo)
-log_info "Step 1/2: Applying repo configs to ~/..."
-if [ "$DRY_RUN" = true ]; then
-    bash "$REPO_DIR/install-configs.sh" --dry-run --no-backup
-else
-    bash "$REPO_DIR/install-configs.sh" --no-backup
-fi
-echo ""
-
-# Step 2: Sync local configs back to the repo
-log_info "Step 2/2: Syncing ~/ configs to repo..."
+# Sync local configs to the repo (home is source of truth)
+log_info "Syncing ~/ configs to repo..."
 sync_file "$HOME/.bashrc" "$REPO_DIR/configs/bash/bashrc"
 sync_file "$HOME/.config/zellij/config.kdl" "$REPO_DIR/configs/zellij/config.kdl"
 sync_file "$HOME/.config/zellij/layouts" "$REPO_DIR/configs/zellij/layouts"
+sync_file "$HOME/.config/zellij/themes" "$REPO_DIR/configs/zellij/themes"
 sync_file "$HOME/.fzf.bash" "$REPO_DIR/configs/fzf/fzf.bash"
 sync_opencode
 sync_nvim
+sync_nvim_lazyvim
 sync_file "$HOME/.config/kitty/kitty.conf" "$REPO_DIR/configs/kitty/kitty.conf"
+sync_file "$HOME/.config/starship.toml" "$REPO_DIR/configs/starship/starship.toml"
 
 if [ "$DRY_RUN" = true ]; then
     echo ""

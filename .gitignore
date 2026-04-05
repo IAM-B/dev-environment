@@ -2,11 +2,18 @@
 node_modules/
 bun.lock
 
-# Neovim generated files
+# Neovim generated files (legacy config)
 configs/nvim/lazy-lock.json
 configs/nvim/.luarc.json
 configs/nvim/plugin/
 configs/nvim/lazy/
+
+# LazyVim generated files (primary config)
+configs/nvim-lazyvim/lazy-lock.json
+configs/nvim-lazyvim/.luarc.json
+configs/nvim-lazyvim/.neoconf.json
+configs/nvim-lazyvim/plugin/
+configs/nvim-lazyvim/lazy/
 
 # OS files
 .DS_Store

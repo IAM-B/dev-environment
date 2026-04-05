@@ -40,7 +40,6 @@ print_help() {
     echo "  --skip-deps    Skip dependency installation"
     echo "  --skip-configs Skip configuration installation"
     echo "  --skip-nvim    Skip Neovim plugin installation"
-    echo "  --with-kitty   Also install Kitty terminal (GPU-accelerated)"
     echo "  --force        Force reinstallation of all components"
     echo "  --help         Display this help message"
     echo ""
@@ -58,8 +57,13 @@ install_nvim_plugins() {
     log_info "Bootstrapping lazy.nvim and installing Neovim plugins..."
     log_info "This may take a few minutes..."
 
+    # Legacy config
     nvim --headless "+Lazy! sync" +qa 2>/dev/null || true
-    add_installed "Plugins Neovim (lazy.nvim)"
+    add_installed "Plugins Neovim (lazy.nvim - legacy)"
+
+    # LazyVim config (primary)
+    NVIM_APPNAME=nvim-lazyvim nvim --headless "+Lazy! sync" +qa 2>/dev/null || true
+    add_installed "Plugins LazyVim (primary config)"
 }
 
 install_fzf() {
@@ -147,11 +151,13 @@ print_summary() {
     echo "2. Close and reopen your terminal (for ble.sh)"
     echo ""
     echo "3. Test:"
-    echo "   nvim      # Editor (Neovim)"
+    echo "   lvim      # LazyVim (primary config)"
+    echo "   nvim      # Legacy config"
     echo "   zellij    # Multiplexer"
     echo "   opencode  # AI Assistant"
     echo ""
     echo "4. Documentation:"
+    echo "   $SCRIPT_DIR/docs/lazyvim-guide.md"
     echo "   $SCRIPT_DIR/docs/VIM-GUIDE.md"
     echo "   $SCRIPT_DIR/docs/BASH-SHORTCUTS.md"
     echo ""
@@ -162,7 +168,6 @@ main() {
     local skip_deps=false
     local skip_configs=false
     local skip_nvim=false
-    local with_kitty=false
     local force=false
 
     for arg in "$@"; do
@@ -171,7 +176,6 @@ main() {
             --skip-configs) skip_configs=true ;;
             --skip-nvim) skip_nvim=true ;;
             --skip-vim) skip_nvim=true ;;  # Backward compatibility
-            --with-kitty) with_kitty=true ;;
             --force) force=true ;;
             --help) print_help; exit 0 ;;
             *) log_error "Unknown option: $arg"; print_help; exit 1 ;;
@@ -190,9 +194,7 @@ main() {
     # Step 1: System dependencies
     log_step "1/6 - System dependencies"
     if [ "$skip_deps" = false ]; then
-        local deps_args=""
-        [ "$with_kitty" = true ] && deps_args="--with-kitty"
-        bash "$SCRIPT_DIR/install-deps.sh" $deps_args
+        bash "$SCRIPT_DIR/install-deps.sh"
         add_installed "System dependencies"
     else
         log_info "Dependencies skipped"
