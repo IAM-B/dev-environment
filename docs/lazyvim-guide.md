@@ -507,6 +507,27 @@ ou ouvrir `configs/nvim-lazyvim/lazyvim.json`.
 
 ---
 
+## FICHE RAPIDE - Edge (AdonisJS)
+
+Les fichiers `.edge` sont detectes automatiquement avec coloration syntaxique
+TokyoNight (syntaxe Vim classique, treesitter desactive pour Edge).
+
+### Tailwind class wrapping
+
+Prettier casse les expressions `{{ }}` dans Edge, donc un formatter custom
+est utilise pour wrapper les longues classes Tailwind (> 80 chars).
+
+```
+<leader>tw               Wrapper les classes Tailwind du buffer
+:TailwindWrapAll          Wrapper tous les .edge du projet
+```
+
+- Auto-wrap au save sur `*.edge` et `*.html`
+- Skip les lignes contenant `{{ }}` pour ne pas casser les expressions Edge
+- Config : `lua/config/autocmds.lua`
+
+---
+
 ## FICHE RAPIDE - Git dans LazyVim
 
 ### Lazygit (interface complete)
