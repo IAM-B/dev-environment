@@ -88,11 +88,14 @@ LazyVim n'inclut pas Harpoon. Tu dois l'ajouter en "extra" si tu veux.
 | `<S-h>`          | Buffer precedent (Shift+h)         |
 | `<S-l>`          | Buffer suivant (Shift+l)           |
 | `<leader>bb`     | Buffer alternatif (dernier utilise) |
-| `<leader>bd`     | Fermer le buffer                    |
+| `<leader>bd`     | Fermer le buffer courant            |
 | `<leader>bo`     | Fermer tous les autres buffers      |
+| `<leader>br`     | Fermer les buffers a droite         |
+| `<leader>bl`     | Fermer les buffers a gauche         |
 | `<leader>bj`     | Choisir un buffer (picker)          |
 | `<leader>bp`     | Pin/unpin le buffer                 |
 | `<leader>bP`     | Fermer les buffers non-pinnes       |
+| `Ctrl+d`         | Fermer buffer depuis le picker      |
 
 ### Fenetres (splits)
 
