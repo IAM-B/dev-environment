@@ -158,8 +158,8 @@ zd() {
 za() {
   if [ -n "$1" ]; then zellij attach "$1"; else zellij --session "agents-${PWD##*/}-$(date +%H%M)" --new-session-with-layout agents; fi
 }
-alias zat='zellij list-sessions'                                    # List sessions
-alias zl='zellij list-sessions'                                     # List sessions
+alias zat='zellij attach'                                    # List sessions
+alias zl='zellij list-sessions'                                     # Attach sessions
 alias zk='zellij kill-session'                                      # Kill a session
 alias zka='zellij delete-all-sessions'                              # Kill all dead sessions
 
